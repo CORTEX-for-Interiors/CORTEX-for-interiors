@@ -13,9 +13,9 @@ node --test site\tests\request.test.mjs           form function tests
 
 Deploying: `DEPLOY.md` (every step is Rishi's hand). Lead hand-off: `HERMES-INTAKE.md`.
 
-Design: built with the `design-taste-frontend` skill (installed project-scope 2026-10-13). The design read and dials are at the top of `src/styles/site.css`; the skill's pre-flight items that can be checked mechanically are build gates.
+Design: built with the `design-taste-frontend` skill (installed project-scope 2026-10-13). **Restyled 2026-10-14 to the film's Travertine and Brass system** (Cormorant Garamond display, IBM Plex Sans, arched photographs, light and dark) with a new `/services` page for Menu v2. Photos are the film's AI-generated sample room, each labeled on the page. The design read and dials are at the top of `src/styles/site.css`; the skill's pre-flight items that can be checked mechanically are build gates.
 
-**Measured 2026-10-13 (local, Lighthouse 12.6.1, mobile):** Performance 99, Accessibility 100, Best Practices 100, SEO 100; LCP 2.1 s, CLS 0, TBT 0 ms.
+**Measured 2026-10-13, before the 10-14 restyle (local, Lighthouse 12.6.1, mobile; not re-measured):** Performance 99, Accessibility 100, Best Practices 100, SEO 100; LCP 2.1 s, CLS 0, TBT 0 ms.
 
 | Folder | What |
 |---|---|

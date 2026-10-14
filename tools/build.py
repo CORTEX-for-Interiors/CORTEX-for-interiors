@@ -113,7 +113,7 @@ def gate_page(name: str, doc: str, meta: dict, errors: list, warnings: list, blo
         errors.append(f"{name}: inline style attribute (blocked by the CSP)")
     if re.search(r"fonts\.googleapis|fonts\.gstatic", doc):
         errors.append(f"{name}: third-party font host (fonts are self-hosted)")
-    sections = len(re.findall(r"<section", doc)) or 1
+    sections = len(re.findall(r"<section\b", doc)) or 1
     eyebrows = len(re.findall(r'class="eyebrow"', doc))
     if eyebrows > -(-sections // 3):
         errors.append(f"{name}: {eyebrows} eyebrows for {sections} sections (max {-(-sections // 3)})")
