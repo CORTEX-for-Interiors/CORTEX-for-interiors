@@ -83,3 +83,9 @@
 - 2026-10-14 12:45 · site-build · local build · dist/ · PASS (local; launch blockers listed), 0 errors, 4 launch blockers, 0 warnings
 - 2026-10-14 12:45 · site-build · local build · dist/ · PASS (local; launch blockers listed), 0 errors, 4 launch blockers, 0 warnings
 - 2026-10-14 12:45 · site-build · local build · dist/ · PASS (local; launch blockers listed), 0 errors, 4 launch blockers, 0 warnings
+- 2026-10-14 14:14 · site-build · local build · dist/ · PASS (local; launch blockers listed), 0 errors, 4 launch blockers, 0 warnings
+- 2026-10-14 14:14 · site-build · local build · dist/ · PASS (local; launch blockers listed), 0 errors, 4 launch blockers, 0 warnings
+- 2026-10-14 14:14 · site-build · deploy build · dist/ · FAIL, 0 errors, 4 launch blockers, 0 warnings
+- 2026-10-14 14:14 · site-build · local build · dist/ · PASS (local; launch blockers listed), 0 errors, 4 launch blockers, 0 warnings
+- 2026-10-14 14:14 · site-build · local build · dist/ · PASS (local; launch blockers listed), 0 errors, 4 launch blockers, 0 warnings
+- 2026-10-14 14:14 · site-build · local build · dist/ · PASS (local; launch blockers listed), 0 errors, 4 launch blockers, 0 warnings

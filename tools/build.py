@@ -117,9 +117,9 @@ def gate_page(name: str, doc: str, meta: dict, errors: list, warnings: list, blo
     eyebrows = len(re.findall(r'class="eyebrow"', doc))
     if eyebrows > -(-sections // 3):
         errors.append(f"{name}: {eyebrows} eyebrows for {sections} sections (max {-(-sections // 3)})")
-    for label in set(re.findall(r'<a[^>]+href="/archive-teardown"[^>]*>([^<]+)</a>', doc)):
+    for label in set(re.findall(r'<a[^>]+href="/project-map"[^>]*>([^<]+)</a>', doc)):
         if label.strip() != CTA_LABEL:
-            errors.append(f"{name}: CTA to /archive-teardown labeled '{label.strip()}', use '{CTA_LABEL}'")
+            errors.append(f"{name}: CTA to /project-map labeled '{label.strip()}', use '{CTA_LABEL}'")
     leftover = re.findall(r"\{\{[^}]+\}\}", doc)
     if leftover:
         errors.append(f"{name}: unfilled template slot {leftover[0]}")
