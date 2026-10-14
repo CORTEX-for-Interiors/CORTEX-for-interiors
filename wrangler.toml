@@ -1,0 +1,4 @@
+# Cloudflare Pages project config. Deploys happen only by Rishi's hand (see DEPLOY.md).
+name = "cortex-studio-site"
+pages_build_output_dir = "./dist"
+compatibility_date = "2026-10-01"
