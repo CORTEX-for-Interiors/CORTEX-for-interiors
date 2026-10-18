@@ -1,0 +1,25 @@
+{
+  "_note": "Copy of cortex_studio/law.py UNIVERSAL_BANNED so the site builds on its own (Vercel). tests/test_site.py fails if the two drift.",
+  "universal_banned": [
+    "in today's fast-paced world",
+    "unlock",
+    "elevate your",
+    "game-changer",
+    "look no further",
+    "we've got you covered",
+    "unleash",
+    "leverage",
+    "revolutionary",
+    "harness",
+    "delve",
+    "supercharge",
+    "unlock the power of",
+    "elevate your space",
+    "dream home",
+    "timeless elegance",
+    "bespoke luxury",
+    "curated",
+    "transform your space",
+    "aesthetic journey"
+  ]
+}

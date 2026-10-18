@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import html
 import json
+import os
 import re
 import shutil
 import sys
@@ -24,7 +25,11 @@ from pathlib import Path
 SITE = Path(__file__).resolve().parent.parent
 REPO = SITE.parent
 sys.path.insert(0, str(REPO))
-from cortex_studio.law import EM_DASH, UNIVERSAL_BANNED  # one banned list for crew and site
+try:
+    from cortex_studio.law import EM_DASH, UNIVERSAL_BANNED  # one banned list for crew and site
+except ImportError:  # the site alone (its own repo, built on Vercel): use the copied list
+    EM_DASH = chr(0x2014)
+    UNIVERSAL_BANNED = json.loads((SITE / "tools" / "lexicon.json").read_text(encoding="utf-8"))["universal_banned"]
 
 SRC, PUBLIC, DIST = SITE / "src", SITE / "public", SITE / "dist"
 CONFIG = json.loads((SITE / "site.config.json").read_text(encoding="utf-8"))
@@ -147,7 +152,8 @@ def gate_css(css: str, errors: list) -> None:
 
 
 def main(argv: list[str]) -> int:
-    deploy = "--deploy" in argv
+    # A Vercel production build runs the launch gate too, so a site with blockers cannot go live.
+    deploy = "--deploy" in argv or os.environ.get("VERCEL_ENV") == "production"
     origin = CONFIG["origin"].rstrip("/")
     errors, warnings, blockers = [], [], []
     if not CONFIG.get("og_image"):
