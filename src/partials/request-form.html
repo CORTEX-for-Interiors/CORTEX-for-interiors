@@ -1,0 +1,70 @@
+<!-- The project request form. Switched OFF on 2026-10-18 (Rishi: "form off") until Hermes intake (D6) is live.
+     To switch it back on: put <!--include request-form--> back in pages/project-map.html. -->
+<form class="form" id="request-form" action="/api/request" method="post" novalidate>
+      <div class="field">
+        <label for="f-name">Your name</label>
+        <input id="f-name" name="name" type="text" autocomplete="name" required maxlength="120" aria-describedby="f-name-err">
+        <p class="error" id="f-name-err"></p>
+      </div>
+      <div class="field">
+        <label for="f-email">Work email</label>
+        <input id="f-email" name="email" type="email" autocomplete="email" required maxlength="200" aria-describedby="f-email-err">
+        <p class="error" id="f-email-err"></p>
+      </div>
+      <div class="field">
+        <label for="f-role">Your role</label>
+        <select id="f-role" name="role" required aria-describedby="f-role-err">
+          <option value="">Choose one</option>
+          <option>Owner or founder</option>
+          <option>Marketing</option>
+          <option>Designer</option>
+          <option>Other</option>
+        </select>
+        <p class="error" id="f-role-err"></p>
+      </div>
+      <div class="field">
+        <label for="f-firm">Firm name</label>
+        <input id="f-firm" name="firm" type="text" autocomplete="organization" required maxlength="160" aria-describedby="f-firm-err">
+        <p class="error" id="f-firm-err"></p>
+      </div>
+      <div class="field">
+        <label for="f-country">Country and city</label>
+        <input id="f-country" name="location" type="text" required maxlength="120" placeholder="Dubai, UAE" aria-describedby="f-country-err">
+        <p class="error" id="f-country-err"></p>
+      </div>
+      <div class="field">
+        <label for="f-site">Firm website or Instagram</label>
+        <input id="f-site" name="presence" type="text" maxlength="200">
+      </div>
+      <div class="field">
+        <label for="f-archive">What photos do you have from your projects?</label>
+        <select id="f-archive" name="photo_types" required aria-describedby="f-archive-err">
+          <option value="">Choose one</option>
+          <option>Phone photos from site visits</option>
+          <option>Professional photos</option>
+          <option>Both</option>
+          <option>Not sure</option>
+        </select>
+        <p class="error" id="f-archive-err"></p>
+      </div>
+      <div class="field">
+        <label for="f-where">Where are those photos now?</label>
+        <input id="f-where" name="archive_location" type="text" maxlength="200" placeholder="Phone gallery, WhatsApp, a shared drive">
+      </div>
+      <div class="field">
+        <label for="f-link">Link to one project (optional)</label>
+        <span class="hint" id="f-link-hint">A gallery, a drive folder, or a page on your site.</span>
+        <input id="f-link" name="project_link" type="url" maxlength="400" aria-describedby="f-link-hint f-link-err">
+        <p class="error" id="f-link-err"></p>
+      </div>
+      <div class="hp" aria-hidden="true">
+        <label for="f-hp">Leave this empty</label>
+        <input id="f-hp" name="company_url" type="text" tabindex="-1" autocomplete="off">
+      </div>
+      <div class="field check">
+        <input id="f-consent" name="consent" type="checkbox" value="yes" required>
+        <label for="f-consent">I agree that Cortex Studio may use these details to reply to this request, as set out in the <a href="/privacy">privacy notice</a>.</label>
+      </div>
+      <p class="form-status" id="form-status" role="status" aria-live="polite"></p>
+      <div><button class="btn primary" type="submit">Send a project</button></div>
+    </form>

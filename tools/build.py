@@ -75,7 +75,8 @@ def render(page: Path, origin: str) -> tuple[str, dict]:
     if not meta_match:
         raise SystemExit(f"{page.name}: missing <!--page ...--> header")
     meta = dict(ATTR.findall(meta_match.group(1)))
-    body = raw[meta_match.end():].replace("<!--include cta-->", partial("cta"))
+    body = (raw[meta_match.end():].replace("<!--include cta-->", partial("cta"))
+            .replace("<!--include request-form-->", partial("request-form")))
     path = meta["path"]
     head = (partial("head")
             .replace("{{title}}", html.escape(meta["title"]))
