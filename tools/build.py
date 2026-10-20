@@ -36,7 +36,7 @@ CONFIG = json.loads((SITE / "site.config.json").read_text(encoding="utf-8"))
 META = re.compile(r"<!--page (.*?)-->", re.S)
 ATTR = re.compile(r'(\w+)="(.*?)"')
 MAX_SENTENCE_WORDS = 14  # studio voice rule, profile.json
-CTA_LABEL = "Send a project"  # one label per intent (design-taste 4.5)
+CTA_LABEL = "Get my free Project Map"  # one label per intent (design-taste 4.5); value-led label, Rishi 2026-10-20
 
 
 def partial(name: str) -> str:
@@ -51,6 +51,7 @@ def jsonld(origin: str) -> str:
         "url": origin + "/",
         "description": CONFIG["description"],
         "areaServed": CONFIG["area_served"],
+        "email": CONFIG["email"],
         "knowsAbout": ["Interior design marketing", "Instagram content", "Content operations"],
     }, ensure_ascii=False)
 

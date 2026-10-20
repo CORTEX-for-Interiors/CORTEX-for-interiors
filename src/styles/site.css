@@ -191,6 +191,7 @@ section { padding-block: clamp(72px, 10vw, 136px); }
 .cta-band .wrap { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 24px 48px; align-items: end; }
 .cta-band h2 { margin-bottom: 8px; }
 .cta-band p { margin: 0; color: var(--ink-mid); }
+.cta-band p + p { margin-top: 12px; }
 
 /* Form: label above input, error below */
 .form { display: grid; gap: 22px; max-width: 680px; }
