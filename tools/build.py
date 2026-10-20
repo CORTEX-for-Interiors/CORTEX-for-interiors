@@ -6,7 +6,8 @@
 
 Gates (PRD doc 03, section 7):
   errors always   em dash, banned word, literal color outside a token, not exactly one <h1>,
-                  an <img> that is neither a permitted client photo nor labeled sample,
+                  an <img> that is neither a permitted client photo nor labeled sample
+                  (exempt: our own brand SVGs under /logo/, Rishi 2026-10-20),
                   a template slot left unfilled
   errors on --deploy   placeholder domain, [[CONTENT]] placeholders, a page still marked legal draft
 """
@@ -49,6 +50,7 @@ def jsonld(origin: str) -> str:
         "@type": "ProfessionalService",
         "name": "Cortex Studio",
         "url": origin + "/",
+        "logo": origin + "/android-chrome-512x512.png",
         "description": CONFIG["description"],
         "areaServed": CONFIG["area_served"],
         "email": CONFIG["email"],
@@ -110,7 +112,8 @@ def gate_page(name: str, doc: str, meta: dict, errors: list, warnings: list, blo
     if h1s != 1:
         errors.append(f"{name}: {h1s} <h1> elements, need exactly 1")
     for img in re.findall(r"<img\b[^>]*>", doc):
-        if 'data-photo="permitted"' not in img and 'data-sample' not in img:
+        brand_logo = re.search(r'src="/logo/[^"/]+\.svg"', img)
+        if 'data-photo="permitted"' not in img and 'data-sample' not in img and not brand_logo:
             errors.append(f"{name}: image without permission or sample label: {img[:60]}")
         if "alt=" not in img:
             errors.append(f"{name}: image without alt text")
