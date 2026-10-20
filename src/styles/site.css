@@ -162,6 +162,14 @@ section { padding-block: clamp(72px, 10vw, 136px); }
 .tier .for { color: var(--ink-mid); font-size: 0.98rem; margin-bottom: 22px; min-height: 3.3em; }
 .tier .plus { font-size: 0.74rem; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent); margin: 0 0 14px; }
 .tier .plain { gap: 11px; font-size: 0.98rem; }
+.tier .price { font-family: var(--display); font-size: clamp(1.7rem, 2.4vw, 2.1rem); line-height: 1.1; color: var(--ink); margin: 0 0 4px; }
+.tier .price span { font-family: var(--body); font-size: 0.9rem; color: var(--ink-mid); }
+.tier .count { font-size: 0.95rem; font-weight: 600; color: var(--accent); margin: 0 0 22px; }
+.setup-price { font-family: var(--display); font-size: clamp(1.5rem, 2.2vw, 1.9rem); color: var(--ink); margin: 0 0 18px; }
+.founding { margin-top: 44px; border-left: 2px solid var(--brass); padding: 6px 0 6px 28px; max-width: 64ch; }
+.founding h3 { font-size: clamp(1.6rem, 2.4vw, 2rem); margin: 0 0 10px; }
+.founding p { margin: 0 0 8px; }
+.terms { margin-top: 28px; color: var(--ink-mid); font-size: 0.95rem; }
 .addons { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 36px clamp(28px, 5vw, 80px); margin: 40px 0 0; }
 .addons dt { font-family: var(--display); font-size: 1.6rem; line-height: 1.2; margin-bottom: 8px; }
 .addons dd { margin: 0; color: var(--ink-mid); max-width: 46ch; }
