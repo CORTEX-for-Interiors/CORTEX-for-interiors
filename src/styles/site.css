@@ -87,6 +87,8 @@ p { margin: 0 0 1em; max-width: 62ch; }
 .btn.small { padding: 11px 16px; font-size: 0.72rem; }
 .btn[disabled] { opacity: 0.6; cursor: progress; }
 .actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 32px; }
+.copy-line { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin-top: 20px; }
+.copy-line strong { font-weight: 600; overflow-wrap: anywhere; }
 
 /* Sections: airy, density 3 */
 section { padding-block: clamp(72px, 10vw, 136px); }

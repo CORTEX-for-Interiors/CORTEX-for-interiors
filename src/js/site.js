@@ -3,7 +3,20 @@
 //    no scroll listeners). Content above the fold is never hidden, so nothing flashes.
 // 2. Enhance the project request form: inline errors under each field, a sending state,
 //    and a plain message if the request does not go through.
+// 3. Show the Copy button beside the email address, for visitors with no email app set up.
 (function () {
+  if (navigator.clipboard && window.isSecureContext) {
+    Array.prototype.forEach.call(document.querySelectorAll('button[data-copy]'), function (b) {
+      b.hidden = false;
+      b.addEventListener('click', function () {
+        navigator.clipboard.writeText(b.getAttribute('data-copy')).then(function () {
+          b.textContent = 'Copied';
+          setTimeout(function () { b.textContent = 'Copy'; }, 2000);
+        });
+      });
+    });
+  }
+
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   if (!reduce && 'IntersectionObserver' in window) {
