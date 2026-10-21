@@ -55,6 +55,7 @@ def jsonld(origin: str) -> str:
         "areaServed": CONFIG["area_served"],
         "email": CONFIG["email"],
         "knowsAbout": ["Interior design marketing", "Instagram content", "Content operations"],
+        "sameAs": CONFIG.get("same_as", []),
     }, ensure_ascii=False)
 
 

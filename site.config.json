@@ -6,5 +6,9 @@
     "India"
   ],
   "email": "rishi@cortexforinteriors.com",
-  "og_image": "/og-v2.jpg"
+  "og_image": "/og-v2.jpg",
+  "same_as": [
+    "https://www.linkedin.com/company/cortex-for-interiors",
+    "https://www.instagram.com/cortexforinteriors/"
+  ]
 }
