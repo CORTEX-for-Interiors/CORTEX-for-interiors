@@ -134,3 +134,4 @@
 - 2026-10-18 23:37 · site-build · local build · dist/ · PASS (local; launch blockers listed), 0 errors, 0 launch blockers, 0 warnings
 - 2026-10-18 23:37 · site-build · local build · dist/ · PASS (local; launch blockers listed), 0 errors, 0 launch blockers, 0 warnings
 - 2026-10-18 23:37 · site-build · local build · dist/ · PASS (local; launch blockers listed), 0 errors, 0 launch blockers, 0 warnings
+- 2026-10-22 07:27 · claude (v2 review) · RUNLOG.md · the uncommitted build lines written after 2026-10-18 23:37 (189 lines) were discarded by a mistaken git checkout during the v2 review; not recoverable, no build or deploy state depended on them
