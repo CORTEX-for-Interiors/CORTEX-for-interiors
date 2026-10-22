@@ -52,12 +52,19 @@ www.cortexforinteriors.com. Steps marked **(Rishi)** are his hand: accounts, pus
    A day before step 6, lower the `www` TTL at Namecheap to 5 minutes.
 6. **(Rishi) Switch `www` at Namecheap:** Advanced DNS → `CNAME www` → `cortex-studio-site.pages.dev`.
    This is the moment the live site moves. Change nothing else in the same sitting.
-7. **(Rishi) The bare domain.** Cloudflare can only serve a bare domain whose nameservers are on Cloudflare,
-   so `cortexforinteriors.com` needs a redirect at Namecheap instead: replace `A @ 216.198.79.1` with a
-   URL Redirect Record, `@` → `https://www.cortexforinteriors.com`, permanent (301). Then test both
-   `http://cortexforinteriors.com` and `https://cortexforinteriors.com`. **Unverified:** whether Namecheap's
-   redirect answers on `https://`. If it does not, the fallback is moving the nameservers to Cloudflare, which
-   means copying every Zoho record across first. That is a separate decision.
+7. **(Rishi) The bare domain: move the nameservers to Cloudflare.** Cloudflare can only serve a bare domain
+   whose nameservers are on Cloudflare. Until then `A @ 216.198.79.1` stays, and Vercel answers for the bare
+   domain with a redirect to www.
+
+   **Tried and reverted 2026-10-22: a Namecheap URL Redirect Record does not work.** It redirected
+   `http://cortexforinteriors.com` (301), but `https://cortexforinteriors.com` timed out: Namecheap's redirect
+   server (`162.255.119.215`) does not answer on port 443. That breaks returning visitors, because Vercel's
+   bare-domain redirect sends `Strict-Transport-Security: max-age=63072000`, so their browsers only try
+   `https`. Do not use a Namecheap redirect for `@`.
+
+   Nameserver move, in order: add `cortexforinteriors.com` as a zone in Cloudflare (free plan), let it import
+   the records, check every one against Namecheap (3 Zoho MX, SPF, Zoho verification, DMARC, DKIM, `www`),
+   add the Pages custom domain for the bare domain, then change the nameservers at Namecheap.
 8. **Verify live:** the step 3 checks on www.cortexforinteriors.com, and a test email in and out of
    rishi@cortexforinteriors.com. Search Console: resubmit the sitemap.
 9. **After 7 calm days (Rishi):** remove the domain from the Vercel project, then pause or delete it. Then
@@ -68,4 +75,10 @@ www.cortexforinteriors.com. Steps marked **(Rishi)** are his hand: accounts, pus
 - Before step 6: nothing to undo on the live site. Delete the Pages project if you want.
 - After step 6: set `CNAME www` back to `b0ddd3f5c6ff9078.vercel-dns-017.com`. Vercel keeps building `main`
   until step 9, so it is still current.
-- After step 7: restore `A @ 216.198.79.1` in place of the redirect record.
+- After step 7: set the nameservers at Namecheap back to Namecheap BasicDNS. Its records stay in place
+  until then, so keep them unchanged.
+
+## Progress
+
+- 2026-10-22: steps 1 to 6 done (main `1e8152c`; www on Cloudflare, certificate valid to 2027-01-20).
+  Step 7 redirect tried and reverted (above). Inbound mail verified after the switch.
