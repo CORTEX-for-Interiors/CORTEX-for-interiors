@@ -172,3 +172,15 @@
 - 2026-10-22 10:23 · site-build · local build · dist/ · PASS (local; launch blockers listed), 0 errors, 0 launch blockers, 0 warnings
 - 2026-10-22 10:23 · site-build · local build · dist/ · PASS (local; launch blockers listed), 0 errors, 0 launch blockers, 0 warnings
 - 2026-10-22 10:23 · site-build · local build · dist/ · PASS (local; launch blockers listed), 0 errors, 0 launch blockers, 0 warnings
+- 2026-10-22 12:45 · site-build · local build · dist/ · PASS (local; launch blockers listed), 0 errors, 0 launch blockers, 0 warnings
+- 2026-10-22 12:49 · site-build · local build · dist/ · PASS (local; launch blockers listed), 0 errors, 0 launch blockers, 0 warnings
+- 2026-10-22 12:49 · site-build · local build · dist/ · PASS (local; launch blockers listed), 0 errors, 0 launch blockers, 0 warnings
+- 2026-10-22 12:50 · site-build · local build · dist/ · PASS (local; launch blockers listed), 0 errors, 0 launch blockers, 0 warnings
+- 2026-10-22 12:52 · site-build · deploy build · dist/ · PASS (deploy), 0 errors, 0 launch blockers, 0 warnings
+- 2026-10-22 12:52 · site-build · local build · dist/ · PASS (local; launch blockers listed), 0 errors, 0 launch blockers, 0 warnings
+- 2026-10-22 12:52 · site-build · deploy build · dist/ · PASS (deploy), 0 errors, 0 launch blockers, 0 warnings
+- 2026-10-22 12:52 · site-build · local build · dist/ · PASS (local; launch blockers listed), 0 errors, 0 launch blockers, 0 warnings
+- 2026-10-22 12:52 · site-build · local build · dist/ · PASS (local; launch blockers listed), 0 errors, 0 launch blockers, 0 warnings
+- 2026-10-22 12:52 · site-build · local build · dist/ · PASS (local; launch blockers listed), 0 errors, 0 launch blockers, 0 warnings
+- 2026-10-22 12:52 · site-build · local build · dist/ · PASS (local; launch blockers listed), 0 errors, 0 launch blockers, 0 warnings
+- 2026-10-22 12:53 · release · reading view = classic live site under /read/, v2 becomes the main site · release branch · gates PASS (deploy), 23 + 16 tests green

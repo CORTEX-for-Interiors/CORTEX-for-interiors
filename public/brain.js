@@ -300,11 +300,13 @@
   function mode(reading){
     var old=active;enabled=!reading;body.classList.toggle('journey-enabled',enabled);body.classList.toggle('journey-reading',reading);
     nav.hidden=reading;bottom.hidden=reading;toggle.hidden=false;toggle.textContent=reading?'Explore view':'Reading view';toggle.setAttribute('aria-pressed',String(reading));
-    toggle.setAttribute('title',reading?'Switch to the connected brain':'Read the complete page without animated navigation');
+    toggle.setAttribute('title',reading?'Switch to the connected brain':'Read this page in the classic layout');
     if(reading){if(raf)cancelAnimationFrame(raf);raf=0;journey.style.height='';contents.forEach(function(c){c.style.transform='';c.style.marginTop='';});chapters.forEach(function(s){s.inert=false;s.removeAttribute('aria-hidden');s.style.opacity='';});requestAnimationFrame(function(){chapters[old].scrollIntoView();});}
     else{measure(false);window.scrollTo(0,metrics[old].start);schedule();}
   }
-  toggle.addEventListener('click',function(){mode(enabled);});
+  // Reading view is the classic site, served under /read/ (Rishi 2026-10-22). The in-page reading mode stays for
+  // reduced motion and Escape, and this button takes it back to the brain.
+  toggle.addEventListener('click',function(){if(enabled)location.href='/read'+path;else mode(false);});
   next.addEventListener('click',function(){
     if(active<chapters.length-1)go(active+1,true);
     else go(0,true);

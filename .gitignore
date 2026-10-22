@@ -1,3 +1,5 @@
 dist/
 node_modules/
 __pycache__/
+classic/dist/
+classic/RUNLOG.md

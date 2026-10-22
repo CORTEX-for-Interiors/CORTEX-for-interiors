@@ -19,6 +19,7 @@ import json
 import os
 import re
 import shutil
+import subprocess
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -157,6 +158,36 @@ def gate_css(css: str, errors: list) -> None:
             errors.append(f"site.css line {n}: literal color outside a token")
 
 
+# Reading view (Rishi 2026-10-22): "I want the current live version in reading view". The classic site that was
+# live before v2 is vendored in classic/ and served under /read/. It shares v2's images, fonts and logos (identical
+# files); only its stylesheet, script and page links move under /read/. Search engines index the v2 pages only.
+CLASSIC_PAGES = {"index": "/", "how-it-works": "/how-it-works", "services": "/services", "about": "/about",
+                 "project-map": "/project-map"}
+
+
+def build_classic(origin: str, errors: list) -> None:
+    classic = SITE / "classic"
+    run = subprocess.run([sys.executable, str(classic / "tools" / "build.py")], capture_output=True, text=True)
+    if run.returncode != 0:
+        errors.append("classic (reading view) build failed: " + (run.stdout + run.stderr).strip().splitlines()[-1])
+        return
+    out = DIST / "read"
+    out.mkdir()
+    for name in ("site.css", "site.js"):
+        shutil.copy(classic / "dist" / name, out / name)
+    links = "|".join(re.escape(p) for p in sorted(CLASSIC_PAGES.values(), key=len, reverse=True) if p != "/")
+    for stem, path in CLASSIC_PAGES.items():
+        doc = (classic / "dist" / f"{stem}.html").read_text(encoding="utf-8")
+        doc = doc.replace('href="/site.css"', 'href="/read/site.css"').replace('src="/site.js"', 'src="/read/site.js"')
+        doc = re.sub(r'href="(' + links + r')(#[^"]*)?"', lambda m: f'href="/read{m.group(1)}{m.group(2) or ""}"', doc)
+        doc = doc.replace('href="/"', 'href="/read"')
+        doc = re.sub(r'<link rel="canonical" href="[^"]*">', f'<link rel="canonical" href="{origin}{path}">', doc)
+        doc = re.sub(r'<meta name="robots" content="[^"]*">', '<meta name="robots" content="noindex,follow">', doc)
+        doc = doc.replace('<nav class="site-nav" aria-label="Main">',
+                          f'<nav class="site-nav" aria-label="Main"><a href="{path}">Explore view</a>', 1)
+        (out / f"{stem}.html").write_text(doc, encoding="utf-8")
+
+
 def main(argv: list[str]) -> int:
     # A Vercel production build runs the launch gate too, so a site with blockers cannot go live.
     deploy = "--deploy" in argv or os.environ.get("VERCEL_ENV") == "production"
@@ -198,6 +229,8 @@ def main(argv: list[str]) -> int:
     llms = ["# Cortex Studio", "", f"> {CONFIG['description']}", ""]
     llms += [f"- [{t}]({u}): {d}" for u, t, d in pages_for_llms]
     (DIST / "llms.txt").write_text("\n".join(llms) + "\n", encoding="utf-8")
+
+    build_classic(origin, errors)
 
     for w in warnings:
         print("WARN   ", w)
