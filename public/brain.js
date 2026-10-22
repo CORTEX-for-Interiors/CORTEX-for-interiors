@@ -115,12 +115,14 @@
     var rect=chapters[i].getBoundingClientRect();
     var cut=clamp(rect.right+28,0,w);
     var size=Math.min(w*.235,h*.36);
-    if(w<701)return {x:w*.96,y:-30,s:280,cut:w*.68,wide:1,opacity:1};
+    // Phones: the brain gets its own band between the header and the chapter text.
+    if(w<701){var band=Math.max(64,rect.top-canvas.getBoundingClientRect().top-6);return {x:w/2,y:band/2,s:Math.min(band*.44,w*.3),cut:0,wide:0,opacity:1,band:band};}
     var dense=!!chapters[i].dataset.layout;
     if(!dense)return {x:Math.max(w*.78,cut+size*.65),y:h*.44,s:size,cut:cut,wide:0,opacity:1};
     // Dense chapters: the brain sits in the free slice on the right, centred in height, not in the bottom corner.
-    var free=w-cut,s=size*.9;
-    return {x:Math.max(cut+16+s*.92,cut+free/2),y:h*.46,s:s,cut:cut,wide:1,opacity:1};
+    // The whole brain fits the free slice (scaled down if needed), so it is never shown as a clipped strip.
+    var free=w-cut,s=clamp((free-36)/1.95,58,size*.9);
+    return {x:cut+free/2,y:h*.46,s:s,cut:cut,wide:1,opacity:1};
   }
   function draw() {
     raf=0;if(!enabled||document.hidden)return;
@@ -142,16 +144,18 @@
     var from=pose(state.index),to=pose(Math.min(state.index+1,chapters.length-1));
     var cx=from.x+(to.x-from.x)*t,cy=from.y+(to.y-from.y)*t,size=from.s+(to.s-from.s)*t;
     var wide=from.wide+(to.wide-from.wide)*t,opacity=from.opacity+(to.opacity-from.opacity)*t;
-    var angle=.25+state.index*.95+t*.95, tilt=Math.sin(state.phase*.7)*.13;
+    // One fixed tilt and a gentle perspective keep the silhouette the same at every rotation.
+    var angle=.25+state.index*.95+t*.95, tilt=.08;
     ctx.save();
     // The drawing is confined to real whitespace, including while chapters change.
-    var cut=Math.max(from.cut,to.cut);
-    if(!state.turn)cut=from.cut;
-    ctx.beginPath();ctx.rect(cut,0,w-cut,w<701?58:h-120);ctx.clip();
+    // The clip edge travels with the brain, so a change of layout never shows it as a clipped strip.
+    var cut=from.cut+(to.cut-from.cut)*t;
+    ctx.beginPath();if(w<701)ctx.rect(0,0,w,from.band);else ctx.rect(cut,0,w-cut,h-120);ctx.clip();
     var points=nodes.map(function(p){
-      var x=p[0]*Math.cos(angle)+p[2]*Math.sin(angle),z=-p[0]*Math.sin(angle)+p[2]*Math.cos(angle);
+      // Depth is stretched to match the width (0.84 vs 0.91), so the outline does not narrow when side-on.
+      var pz=p[2]*1.083,x=p[0]*Math.cos(angle)+pz*Math.sin(angle),z=-p[0]*Math.sin(angle)+pz*Math.cos(angle);
       var y=p[1]*Math.cos(tilt)-z*Math.sin(tilt);z=p[1]*Math.sin(tilt)+z*Math.cos(tilt);
-      var perspective=3.6/(3.6-z);
+      var perspective=7/(7-z);
       return {x:cx+x*size*perspective,y:cy+y*size*perspective,z:z,r:perspective};
     });
     var anchor=hubs[i%hubs.length];
@@ -173,7 +177,7 @@
       var depth=clamp((p.z+.9)/1.8,0,1);
       ctx.globalAlpha=opacity*(hot?1:.10+.40*depth);
       ctx.shadowColor=glow;ctx.shadowBlur=dark&&hot?(hub?20:9):0;
-      var radius=(hub?6.8:j%5===0?3.7:2)*p.r;
+      var radius=(hub?6.8:j%5===0?3.7:2)*p.r*clamp(size/230,.42,1);
       var bead=ctx.createRadialGradient(p.x-radius*.35,p.y-radius*.4,radius*.06,p.x,p.y,radius);
       bead.addColorStop(0,hot? (dark?'white':accent): (dark?'white':ink));bead.addColorStop(.42,hot?accent:ink);bead.addColorStop(1,hot?accent:line);ctx.fillStyle=bead;
       ctx.beginPath();ctx.arc(p.x,p.y,radius,0,Math.PI*2);ctx.fill();

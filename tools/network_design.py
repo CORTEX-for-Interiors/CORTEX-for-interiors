@@ -24,7 +24,7 @@ for i,p in enumerate(nodes):
   if d<.48:edges.add(tuple(sorted((i,j))))
 edges=sorted(edges)
 hubs=[]
-for chapter in range(7):
+for chapter in range(8):
  angle=.25+chapter*.95
  # Select a front-facing hub at each chapter's settled orientation.
  candidates=[(i,p) for i,p in enumerate(nodes) if i not in hubs]
