@@ -320,27 +320,30 @@ input, select, textarea { border-radius: 4px; }
 .end-note { font-size: 12px; margin: 24px 0 18px; color: var(--ink-mid); }
 .journey-contact { display: flex; flex-wrap: wrap; gap: 24px; font-size: 11px; }
 
-/* Sphere edition: neon mint on midnight, with a mineral light alternative. */
+/* Lamplight (Rishi 2026-10-22): lights on keeps the chalk and mineral theme under a warm pendant
+   glow; lights off is warm black and gold, with oxblood as the one supporting color (lines only). */
 :root {
   --node-glow: #438D78;
   --header-height: 92px;
+  --lamp-glow: #FBE2B35C;
 }
 :root[data-theme="dark"] {
-  --paper: #080F12;
-  --paper-2: #101C20;
-  --surface: #122126;
-  --ink: #EDF6F1;
-  --ink-mid: #B0C1BC;
-  --rule: #2A4145;
-  --accent: #83F5CC;
-  --on-accent: #081613;
-  --brass: #83F5CC;
-  --sage: #64C8EB;
-  --bad: #FFA08B;
-  --shadow: #00000038;
-  --graph-line: #4AAEAC;
-  --graph-faint: #83F5CC12;
-  --node-glow: #6AFFCB;
+  --paper: #0D0B09;
+  --paper-2: #16120E;
+  --surface: #1A1511;
+  --ink: #F2EBDD;
+  --ink-mid: #BFB3A1;
+  --rule: #332A21;
+  --accent: #D4AF6A;
+  --on-accent: #0D0B09;
+  --brass: #D4AF6A;
+  --sage: #8E3A4C;
+  --bad: #E58A6F;
+  --shadow: #00000059;
+  --graph-line: #6E5737;
+  --graph-faint: #D4AF6A14;
+  --node-glow: #F2C977;
+  --lamp-glow: #FBE2B300;
   color-scheme: dark;
 }
 :root[data-theme="dark"] .wordmark-name img,
@@ -493,4 +496,27 @@ html:has(body.journey-enabled)::-webkit-scrollbar { display: none; }
   body.journey-enabled .brain-chapter[data-layout="wide"] { left:7%; width:78%; }
   body.journey-enabled .brain-chapter[data-layout="steps"] { left:7%; width:59%; }
   body.journey-enabled .detail-journey .steps li { grid-template-columns:150px 1fr; gap:22px; }
+}
+
+/* The lamp: a pendant glow over the page with the lights on; it goes out with the lights. */
+body::before { content: ''; position: fixed; left: 50%; top: 0; width: min(1400px, 140vw); height: 78vh; transform: translateX(-50%); background: radial-gradient(ellipse 50% 62% at 50% 0%, var(--lamp-glow), transparent 72%); pointer-events: none; z-index: -1; transition: opacity .8s ease; }
+:root[data-theme="dark"] body::before { opacity: 0; }
+.lights-switching body, .lights-switching .site-header, .lights-switching .node-card, .lights-switching .social-post,
+.lights-switching .tier, .lights-switching .node-nav, .lights-switching .journey-bottom, .lights-switching .btn,
+.lights-switching h1, .lights-switching h2, .lights-switching h3, .lights-switching p { transition: background-color .8s ease, color .8s ease, border-color .8s ease; }
+.display-tools .lamp { display: inline-flex; align-items: center; gap: 7px; }
+.lamp-icon { width: 16px; height: 16px; flex-shrink: 0; overflow: visible; }
+.lamp-cord { stroke: currentColor; stroke-width: 1.4; fill: none; }
+.lamp-shade { fill: currentColor; }
+.lamp-bulb { fill: var(--accent); transition: fill .5s ease; }
+:root[data-theme="dark"] .lamp-bulb { fill: var(--rule); }
+:root[data-theme="dark"] .display-tools .lamp { color: var(--accent); border-color: var(--accent); }
+
+/* Tap targets: at least 44px tall without changing the visual layout. */
+.site-nav a:not(.btn), .display-tools button, .journey-link, .next-node, .text-link { position: relative; }
+.site-nav a:not(.btn)::after, .journey-link::after, .text-link::after { content: ''; position: absolute; inset: -13px -4px; }
+.display-tools button::after, .next-node::after { content: ''; position: absolute; inset: -5px 0; }
+@media (max-width: 700px) {
+  .lamp-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .display-tools .lamp { min-width: 44px; justify-content: center; }
 }

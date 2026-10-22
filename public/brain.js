@@ -3,16 +3,22 @@
   'use strict';
   var body = document.body, root = document.documentElement;
   var themeButton = document.querySelector('.theme-toggle');
+  // Lamplight: the lamp is the theme switch. Lights on is the light theme, lights off is black and gold.
+  var lampLabel = themeButton.querySelector('.lamp-label'), switching = 0;
   function updateTheme() {
-    themeButton.textContent = root.dataset.theme === 'dark' ? 'Light mode' : 'Dark mode';
-    themeButton.setAttribute('aria-label', 'Switch to ' + (root.dataset.theme === 'dark' ? 'light' : 'dark') + ' mode');
+    var darkNow = root.dataset.theme === 'dark';
+    lampLabel.textContent = darkNow ? 'Lights on' : 'Lights off';
+    themeButton.setAttribute('aria-label', darkNow ? 'Turn the lights on (light theme)' : 'Turn the lights off (dark theme)');
+    themeButton.setAttribute('aria-pressed', String(darkNow));
     themeButton.hidden = false;
   }
   updateTheme();
   themeButton.addEventListener('click', function () {
+    root.classList.add('lights-switching'); clearTimeout(switching);
+    switching = setTimeout(function () { root.classList.remove('lights-switching'); }, 900);
     root.dataset.theme = root.dataset.theme === 'dark' ? 'light' : 'dark';
     try { localStorage.setItem('cortex-theme', root.dataset.theme); } catch (_) {}
-    updateTheme(); colors(); schedule();
+    updateTheme(); if (ink !== undefined) { colors(); schedule(); }
   });
   var journey = document.getElementById('brain-journey');
   var path = location.pathname.replace(/\/$/, '');
@@ -111,7 +117,10 @@
     var size=Math.min(w*.235,h*.36);
     if(w<701)return {x:w*.96,y:-30,s:280,cut:w*.68,wide:1,opacity:1};
     var dense=!!chapters[i].dataset.layout;
-    return {x:dense?w+size*.30:Math.max(w*.78,cut+size*.65),y:dense?h-100+size*.38:h*.44,s:size,cut:cut,wide:dense?1:0,opacity:1};
+    if(!dense)return {x:Math.max(w*.78,cut+size*.65),y:h*.44,s:size,cut:cut,wide:0,opacity:1};
+    // Dense chapters: the brain sits in the free slice on the right, centred in height, not in the bottom corner.
+    var free=w-cut,s=size*.9;
+    return {x:Math.max(cut+16+s*.92,cut+free/2),y:h*.46,s:s,cut:cut,wide:1,opacity:1};
   }
   function draw() {
     raf=0;if(!enabled||document.hidden)return;
@@ -148,7 +157,7 @@
     var anchor=hubs[i%hubs.length];
     if(wide>.8 && w>700){
       var visible=points.map(function(p,j){return {p:p,j:j};}).filter(function(v){return v.p.x>cut+24&&v.p.x<w-24&&v.p.y>70&&v.p.y<h-145;});
-      visible.sort(function(a,b){return (Math.abs(a.p.x-(cut+(w-cut)*.6))+Math.abs(a.p.y-(h-205))*.5-a.p.z*30)-(Math.abs(b.p.x-(cut+(w-cut)*.6))+Math.abs(b.p.y-(h-205))*.5-b.p.z*30);});
+      visible.sort(function(a,b){return (Math.abs(a.p.x-(cut+(w-cut)*.5))+Math.abs(a.p.y-h*.46)*.5-a.p.z*30)-(Math.abs(b.p.x-(cut+(w-cut)*.5))+Math.abs(b.p.y-h*.46)*.5-b.p.z*30);});
       if(visible.length)anchor=visible[0].j;
     }
     var connected=new Set([anchor]);
@@ -177,7 +186,7 @@
         var label=chapters[destination].dataset.node;
         ctx.font=(hot?'600 ':'400 ')+'12px sans-serif';
         var labelWidth=ctx.measureText(label).width+20;
-        var lx=clamp(p.x+(nodes[hubs[destination%hubs.length]][0]<0?-labelWidth-18:18),cut+8,w-labelWidth-12),ly=p.y-14;
+        var lx=clamp(p.x+(nodes[hubs[destination%hubs.length]][0]<0?-labelWidth-18:18),cut+8,w-labelWidth-28),ly=p.y-14;
         ctx.globalAlpha=hot?1:.65;ctx.fillStyle=getComputedStyle(root).getPropertyValue('--paper').trim();
         ctx.fillRect(lx,ly,labelWidth,28);ctx.strokeStyle=hot?accent:(dark?line:ink);ctx.lineWidth=1;ctx.strokeRect(lx,ly,labelWidth,28);
         ctx.fillStyle=hot?accent:ink;ctx.fillText(label,lx+10,ly+18);
