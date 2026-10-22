@@ -28,6 +28,19 @@
     '/about': ['The studio', 'Our approach', 'Our promise', 'Begin'],
     '/project-map': ['Project map', 'The exchange', 'Connect']
   };
+  // Secondary labels: the three nodes each chapter's node connects to, named from that page's copy.
+  var branches = {
+    '': [['Identity', 'Projects', 'Content'], ['Voice', 'Services', 'Approach'], ['Site photos', 'Voice notes', 'Finished rooms'],
+      ['Weekly posts', 'Story kits', 'Reels'], ['Light and colour', 'Site mess cleared', 'Design untouched'],
+      ['Share the work', 'Plan call', 'Weekly drops'], ['Essential', 'Studio', 'Signature'], ['One project', 'Free Project Map', 'Reply in a day']],
+    '/services': [['Your brain', 'Real photos', 'Three plans'], ['Intake call', 'Photo archive', 'Capture kit'], ['Essential', 'Studio', 'Signature'],
+      ['Google profile', 'Extra Reels', 'Your website'], ['Two rewrite rounds', 'Your yes first', 'Room as built'], ['One project', 'Free Project Map', 'Reply in a day']],
+    '/how-it-works': [['Brain first', 'Planned month', 'Your approval'], ['Intake call', 'Weekly drops', 'Seven-point review'],
+      ['Site photos', 'Voice notes', 'Plan call'], ['One project', 'Free Project Map', 'Reply in a day']],
+    '/about': [['Interior firms only', 'One brain each', 'One operator'], ['Every site visit', 'Voice notes', 'Finished projects'],
+      ['No passwords', 'No design changes', 'No invented facts'], ['One project', 'Free Project Map', 'Reply in a day']],
+    '/project-map': [['One project', 'Phone shots', 'Free map'], ['Photos in', 'Post map', 'Photo edits'], ['Reply in a day', 'Project link', 'Your email']]
+  };
   if (!journey && names[path]) {
     journey = document.createElement('div'); journey.id = 'brain-journey'; journey.className = 'brain-journey detail-journey';
     var main = document.getElementById('main');
@@ -164,8 +177,10 @@
       visible.sort(function(a,b){return (Math.abs(a.p.x-(cut+(w-cut)*.5))+Math.abs(a.p.y-h*.46)*.5-a.p.z*30)-(Math.abs(b.p.x-(cut+(w-cut)*.5))+Math.abs(b.p.y-h*.46)*.5-b.p.z*30);});
       if(visible.length)anchor=visible[0].j;
     }
-    var connected=new Set([anchor]);
-    edges.forEach(function(e){if(e[0]===anchor)connected.add(e[1]);if(e[1]===anchor)connected.add(e[0]);});
+    var names2=(branches[path]||[])[i]||[];
+    var neighbours=edges.filter(function(e){return e[0]===anchor||e[1]===anchor;}).map(function(e){return e[0]===anchor?e[1]:e[0];});
+    neighbours.sort(function(a,b){return a-b;});neighbours=neighbours.slice(0,Math.max(3,names2.length));
+    var connected=new Set([anchor].concat(neighbours));
     edges.forEach(function(edge){
       var p=points[edge[0]],q=points[edge[1]],hot=connected.has(edge[0])&&connected.has(edge[1]);
       var depth=clamp(((p.z+q.z)*.5+.9)/1.8,0,1);
@@ -173,29 +188,43 @@
       ctx.shadowColor=glow;ctx.shadowBlur=dark&&hot?7:0;ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(q.x,q.y);ctx.stroke();
     });
     points.map(function(p,j){return {p:p,j:j};}).sort(function(a,b){return a.p.z-b.p.z;}).forEach(function(item){
-      var p=item.p,j=item.j,hot=connected.has(j),hub=hubs.includes(j)||j===anchor;
+      var p=item.p,j=item.j,hot=connected.has(j),hub=j===anchor;
       var depth=clamp((p.z+.9)/1.8,0,1);
       ctx.globalAlpha=opacity*(hot?1:.10+.40*depth);
       ctx.shadowColor=glow;ctx.shadowBlur=dark&&hot?(hub?20:9):0;
-      var radius=(hub?6.8:j%5===0?3.7:2)*p.r*clamp(size/230,.42,1);
+      var radius=(hub?6.8:hot?4.6:j%5===0?3.7:2)*p.r*clamp(size/230,.42,1);
       var bead=ctx.createRadialGradient(p.x-radius*.35,p.y-radius*.4,radius*.06,p.x,p.y,radius);
       bead.addColorStop(0,hot? (dark?'white':accent): (dark?'white':ink));bead.addColorStop(.42,hot?accent:ink);bead.addColorStop(1,hot?accent:line);ctx.fillStyle=bead;
       ctx.beginPath();ctx.arc(p.x,p.y,radius,0,Math.PI*2);ctx.fill();
     });
     ctx.shadowBlur=0;ctx.globalAlpha=1;hits=[];
     if(wide<.2 && w>700){
-      var shown=[i,(i+1)%chapters.length,(i+chapters.length-1)%chapters.length];
-      shown.forEach(function(destination,k){
-        var p=points[hubs[destination%hubs.length]],hot=destination===i;
-        var label=chapters[destination].dataset.node;
-        ctx.font=(hot?'600 ':'400 ')+'12px sans-serif';
-        var labelWidth=ctx.measureText(label).width+20;
-        var lx=clamp(p.x+(nodes[hubs[destination%hubs.length]][0]<0?-labelWidth-18:18),cut+8,w-labelWidth-28),ly=p.y-14;
-        ctx.globalAlpha=hot?1:.65;ctx.fillStyle=getComputedStyle(root).getPropertyValue('--paper').trim();
-        ctx.fillRect(lx,ly,labelWidth,28);ctx.strokeStyle=hot?accent:(dark?line:ink);ctx.lineWidth=1;ctx.strokeRect(lx,ly,labelWidth,28);
-        ctx.fillStyle=hot?accent:ink;ctx.fillText(label,lx+10,ly+18);
-        ctx.beginPath();ctx.arc(p.x,p.y,hot?12:9,0,Math.PI*2);ctx.stroke();
-        hits.push({x:p.x,y:p.y,i:destination,lx:lx,ly:ly,width:labelWidth});
+      var paper=getComputedStyle(root).getPropertyValue('--paper').trim(),muted=getComputedStyle(root).getPropertyValue('--ink-mid').trim();
+      var a=points[anchor],cxn=0,cyn=0,boxes=[];
+      neighbours.forEach(function(j){cxn+=points[j].x;cyn+=points[j].y;});
+      if(neighbours.length){cxn/=neighbours.length;cyn/=neighbours.length;}
+      // Primary label sits away from its neighbours; each secondary label sits away from the active node.
+      function place(p,text,primary,awayX,awayY){
+        ctx.font=(primary?'600 12px ':'400 11px ')+'"IBM Plex Sans", sans-serif';
+        var bw=ctx.measureText(text).width+(primary?20:14),bh=primary?28:22,dx=p.x-awayX,dy=p.y-awayY,len=Math.hypot(dx,dy)||1;
+        var gap=primary?18:12,lx=dx>=0?p.x+gap:p.x-gap-bw,ly=p.y-bh/2+(dy/len)*6;
+        boxes.push({p:p,text:text,primary:primary,w:bw,h:bh,x:clamp(lx,cut+8,w-bw-28),y:clamp(ly,8,h-150-bh)});
+      }
+      place(a,chapters[i].dataset.node,true,cxn||a.x-1,cyn||a.y);
+      neighbours.forEach(function(j,k){if(names2[k])place(points[j],names2[k],false,a.x,a.y);});
+      // The active label stays put; secondary labels step around it and each other, top to bottom.
+      var placed=[boxes[0]],rest=boxes.slice(1).sort(function(m,n){return m.y-n.y;});
+      rest.forEach(function(B){
+        for(var tries=0;tries<6;tries++){var hit=placed.find(function(A){return B.x<A.x+A.w+4&&A.x<B.x+B.w+4&&B.y<A.y+A.h+4&&A.y<B.y+B.h+4;});
+          if(!hit)break;B.y=B.y+B.h/2<hit.y+hit.h/2?hit.y-B.h-4:hit.y+hit.h+4;}
+        placed.push(B);});
+      boxes=placed;
+      boxes.forEach(function(box){
+        ctx.font=(box.primary?'600 12px ':'400 11px ')+'"IBM Plex Sans", sans-serif';
+        ctx.globalAlpha=1;ctx.fillStyle=paper;ctx.fillRect(box.x,box.y,box.w,box.h);
+        ctx.globalAlpha=box.primary?1:.7;ctx.strokeStyle=box.primary?accent:(dark?line:muted);ctx.lineWidth=1;ctx.strokeRect(box.x,box.y,box.w,box.h);
+        ctx.globalAlpha=1;ctx.fillStyle=box.primary?accent:muted;ctx.fillText(box.text,box.x+(box.primary?10:7),box.y+(box.primary?18:15));
+        if(box.primary){ctx.strokeStyle=accent;ctx.beginPath();ctx.arc(box.p.x,box.p.y,12,0,Math.PI*2);ctx.stroke();}
       });
     }
     ctx.restore();
