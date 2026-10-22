@@ -509,19 +509,23 @@ body::before { content: ''; position: fixed; left: 50%; top: 0; width: min(1400p
 .lights-switching .tier, .lights-switching .node-nav, .lights-switching .journey-bottom, .lights-switching .btn,
 .lights-switching h1, .lights-switching h2, .lights-switching h3, .lights-switching p { transition: background-color .8s ease, color .8s ease, border-color .8s ease; }
 .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-/* The switch (Rishi 2026-10-22): a brushed-brass wall plate with a dolly toggle, as an interior designer
-   would specify it. Lever up is lights on (chalk); lever down is lights off (black and gold, pendant lit).
+/* The switch (Rishi 2026-10-22): a square brushed-brass plate with a wide rocker, the switch everyone reads
+   at a glance. Top pressed is lights on (chalk); bottom pressed is lights off (black and gold, pendant lit,
+   amber indicator on).
    On desktop it sits in the header directly above where the brain most often rests, and the pendant
    hangs from it. */
 :root {
   --plate: repeating-linear-gradient(90deg, #FFFFFF14 0 1px, #00000008 1px 3px), linear-gradient(135deg, #EDD6A0, #C29B55 46%, #8C6A30);
   --plate-edge: #7A5A28;
   --plate-shadow: inset 0 1px 0 #FFFFFF73, inset 0 -1px 0 #0000002E, 0 3px 9px #1E191333;
-  --screw: radial-gradient(circle at 38% 34%, #F6E3B4, #9C7838 60%, #5E4520);
-  --rose: radial-gradient(circle at 40% 35%, #F3DEA8, #A8854A 55%, #6B5230);
-  --lever: linear-gradient(90deg, #6B5230, #F0D9A0 45%, #B08A48 70%, #5E4520);
-  --lever-shadow: 0 3px 3px #2B1E0E59;
-  --rose-shadow: inset 0 1px 2px #2B1E0E59;
+  /* The rocker: the pressed half sits in shadow, the raised half catches the light. */
+  --rocker: linear-gradient(180deg, #B89148 0%, #D9BC80 46%, #F4E2B4 52%, #E2C68C 100%);
+  --rocker-edge: #8C6A30;
+  --rocker-shadow: inset 0 1px 0 #FFFFFF59, 0 1px 2px #2B1E0E4D;
+  --rocker-split: #8C6A3080;
+  --switch-mark: #6B5230;
+  --led: #C9B48A;
+  --led-glow: none;
   --cord: linear-gradient(90deg, #4A3518, #E2C27E 45%, #7A5A28);
   --sheen: #FFF6DC;
   --mouth: #E9DFCB;
@@ -537,6 +541,13 @@ body::before { content: ''; position: fixed; left: 50%; top: 0; width: min(1400p
   --plate: repeating-linear-gradient(90deg, #FFFFFF08 0 1px, #00000014 1px 3px), linear-gradient(135deg, #2E251B, #16120E 55%, #0D0B09);
   --plate-edge: #D4AF6A;
   --plate-shadow: inset 0 1px 0 #D4AF6A40, 0 0 14px #D4AF6A2E;
+  --rocker: linear-gradient(180deg, #4A3A26 0%, #2E251B 48%, #16120E 54%, #0D0B09 100%);
+  --rocker-edge: #8A6A2F;
+  --rocker-shadow: inset 0 -1px 0 #D4AF6A40, 0 1px 2px #0000008C;
+  --rocker-split: #D4AF6A59;
+  --switch-mark: #D4AF6A;
+  --led: #FFD98A;
+  --led-glow: 0 0 4px #FFD98A, 0 0 9px #F2C977AA;
   --cord: linear-gradient(90deg, #3E2C12, #D4AF6A 45%, #5E4520);
   --mouth: #FFE9B8;
   --mouth-off: #5E4520;
@@ -549,12 +560,15 @@ body::before { content: ''; position: fixed; left: 50%; top: 0; width: min(1400p
 .display-tools .lamp-switch { position: relative; padding: 0; border: 0; background: none; min-height: 0; border-radius: 5px; }
 .display-tools .lamp-switch:hover { border-color: transparent; }
 .display-tools .lamp-switch::after { inset: -2px -8px; }
-.switch-plate { display: flex; flex-direction: column; align-items: center; justify-content: space-between; width: 30px; height: 46px; padding: 4px 0; box-sizing: border-box; border-radius: 4px; background: var(--plate); border: 1px solid var(--plate-edge); box-shadow: var(--plate-shadow); transition: box-shadow .6s ease, border-color .6s ease; }
-.switch-screw { position: relative; width: 5px; height: 5px; border-radius: 50%; background: var(--screw); }
-.switch-screw::after { content: ''; position: absolute; left: 1px; right: 1px; top: 2px; height: 1px; background: var(--plate-edge); transform: rotate(-30deg); }
-.switch-rose { display: grid; place-items: center; width: 15px; height: 15px; border-radius: 50%; background: var(--rose); box-shadow: var(--rose-shadow); }
-.switch-lever { width: 6px; height: 14px; border-radius: 3px; background: var(--lever); box-shadow: var(--lever-shadow); transform: translateY(-4px); transition: transform .45s cubic-bezier(.6,.05,.25,1); }
-:root[data-theme="dark"] .switch-lever { transform: translateY(4px); }
+.switch-plate { position: relative; display: grid; place-items: center; width: 40px; height: 40px; box-sizing: border-box; border-radius: 5px; background: var(--plate); border: 1px solid var(--plate-edge); box-shadow: var(--plate-shadow); transition: box-shadow .6s ease, border-color .6s ease; }
+.switch-rocker { position: relative; display: block; width: 22px; height: 26px; border-radius: 3px; background: var(--rocker); border: 1px solid var(--rocker-edge); box-shadow: var(--rocker-shadow); transform: perspective(60px) rotateX(10deg); transition: transform .35s cubic-bezier(.6,.05,.25,1), background .6s ease; }
+.switch-rocker::after { content: ''; position: absolute; left: 3px; right: 3px; top: 50%; height: 1px; background: var(--rocker-split); }
+/* Engraved marks: a bar on the upper half (on), a ring on the lower half (off). */
+.switch-mark { position: absolute; left: 50%; transform: translateX(-50%); }
+.switch-mark-on { top: 4px; width: 1.5px; height: 5px; background: var(--switch-mark); }
+.switch-mark-off { bottom: 4px; width: 5px; height: 5px; box-sizing: border-box; border: 1.2px solid var(--switch-mark); border-radius: 50%; }
+.switch-led { position: absolute; bottom: 3px; left: 50%; width: 3px; height: 3px; margin-left: -1.5px; border-radius: 50%; background: var(--led); box-shadow: var(--led-glow); transition: background .6s ease, box-shadow .6s ease; }
+:root[data-theme="dark"] .switch-rocker { transform: perspective(60px) rotateX(-10deg); }
 .lamp-switch:hover .switch-plate { border-color: var(--accent); }
 .lamp-switch:focus-visible .switch-plate { outline: 2px solid var(--accent); outline-offset: 3px; }
 .lamp-switch:focus-visible { outline: 0; }
@@ -579,9 +593,8 @@ body.journey-enabled .pendant { display: block; }
 .site-nav a:not(.btn)::after, .journey-link::after, .text-link::after { content: ''; position: absolute; inset: -13px -4px; }
 .display-tools button::after, .next-node::after { content: ''; position: absolute; inset: -5px 0; }
 @media (max-width: 700px) {
-  .switch-plate { width: 26px; height: 40px; padding: 3px 0; }
-  .switch-rose { width: 13px; height: 13px; }
-  .switch-lever { height: 12px; }
+  .switch-plate { width: 34px; height: 34px; }
+  .switch-rocker { width: 18px; height: 22px; }
   /* No room under the switch on phones (the nav row sits there); the brain still gets the light. */
   body.journey-enabled .pendant { display: none; }
 }
