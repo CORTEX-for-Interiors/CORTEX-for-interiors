@@ -9,7 +9,7 @@ Rewritten 2026-10-22; the Cloudflare Pages plan this file used to describe was n
 
 | Piece | Where |
 |---|---|
-| Hosting | Vercel, Git integration, production branch `main`. Every other branch gets a preview URL. |
+| Hosting | Vercel project `cortexforinteriors` (account rishivendhan84, **Hobby plan**), Git integration, production branch `main`. Every other branch gets a preview URL. |
 | Build | `vercel.json`: `python3 tools/build.py`, output `dist/`, clean URLs, no trailing slash, security headers |
 | Production gate | Vercel sets `VERCEL_ENV=production`, which makes `build.py` run the full launch gate. Any error fails the build, and the last good deploy keeps serving. |
 | Domain | Namecheap DNS: `A @ 216.198.79.1`, `CNAME www` to Vercel. Primary is `www`; the bare domain 308s to it. |
@@ -64,6 +64,7 @@ Run all four from `cortex-studio\site` (the venv lives one level up). Step 1 is 
 
 ## Rollback
 
-Vercel dashboard → the project → Deployments → the last good production deployment → its menu →
-**Instant Rollback**. The site is back in seconds. Then fix forward on a branch and push again through the
+Vercel dashboard → project `cortexforinteriors` → **Overview** → the **Instant Rollback** button at the top
+of the Production Deployment card (next to Visit), then pick the last good deployment. The site is back in
+seconds. Then fix forward on a branch and push again through the
 steps above. Proven 2026-10-22: the check in step 1 passes on `9fc64d7` and fails on `9cb5e61`.
