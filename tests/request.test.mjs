@@ -1,7 +1,7 @@
 // node --test site/tests   (no dependencies; Node 18+ has fetch, FormData, Request, Response)
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { onRequestPost, validate } from '../functions/api/request.js';
+import { onRequestPost, validate } from '../parked/functions/api/request.js';
 
 const good = {
   name: 'Test Person', email: 'owner@example.com', role: 'Owner or founder', firm: 'Sample Firm',

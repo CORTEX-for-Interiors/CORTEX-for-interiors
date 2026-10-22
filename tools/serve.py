@@ -3,7 +3,7 @@
     python site/tools/serve.py [port]      default port 8787
 
 POST /api/request is validated like the real function, then dropped: nothing is stored,
-forwarded or printed except a field count. The real handler is functions/api/request.js.
+forwarded or printed except a field count. The real handler is parked/functions/api/request.js (not deployed).
 """
 
 from __future__ import annotations

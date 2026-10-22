@@ -1,4 +1,4 @@
-# Cloudflare Pages project config. Deploys happen only by Rishi's hand (see DEPLOY.md).
+# Cloudflare Pages project config (the project Rishi creates in the dashboard; see CLOUDFLARE-MOVE.md). Deploys happen only by his hand.
 name = "cortex-studio-site"
 pages_build_output_dir = "./dist"
 compatibility_date = "2026-10-01"

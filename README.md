@@ -22,7 +22,7 @@ Design: built with the `design-taste-frontend` skill (installed project-scope 20
 | `src/pages/` | one file per page, with a `<!--page ...-->` header (title, description, path, sitemap) |
 | `src/partials/` | head, header, footer, CTA band |
 | `src/styles/site.css` | tokens (light + dark) and components |
-| `functions/api/request.js` | Cloudflare Pages Function: validates the form, forwards to Hermes. Needs `HERMES_INTAKE_URL` + `HERMES_INTAKE_TOKEN` in the host settings |
+| `parked/functions/api/request.js` (parked 2026-10-22, not deployed) | Cloudflare Pages Function: validates the form, forwards to Hermes. Needs `HERMES_INTAKE_URL` + `HERMES_INTAKE_TOKEN` in the host settings |
 | `public/` | favicon, `_headers` (security headers, Cloudflare format) |
 | `site.config.json` | origin (placeholder until the domain is bought), JSON-LD description, areas served |
 

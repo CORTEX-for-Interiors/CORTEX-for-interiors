@@ -190,7 +190,7 @@ def build_classic(origin: str, errors: list) -> None:
 
 def main(argv: list[str]) -> int:
     # A Vercel production build runs the launch gate too, so a site with blockers cannot go live.
-    deploy = "--deploy" in argv or os.environ.get("VERCEL_ENV") == "production"
+    deploy = "--deploy" in argv or os.environ.get("VERCEL_ENV") == "production" or os.environ.get("CF_PAGES_BRANCH") == "main"
     origin = CONFIG["origin"].rstrip("/")
     errors, warnings, blockers = [], [], []
     if not CONFIG.get("og_image"):

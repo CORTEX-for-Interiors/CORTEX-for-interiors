@@ -1,6 +1,6 @@
 # Hermes intake contract (for decision D6)
 
-The site never stores a request. `functions/api/request.js` validates it and POSTs it to Hermes,
+The site never stores a request. `parked/functions/api/request.js` (parked 2026-10-22, not deployed) validates it and POSTs it to Hermes,
 which owns every prospect (CORTEX routing rule 1). This file is the contract Hermes implements.
 Nothing here is wired; building the receiving end is a Hermes-session task, on Rishi's word.
 

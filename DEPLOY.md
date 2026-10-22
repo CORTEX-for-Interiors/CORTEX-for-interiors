@@ -5,6 +5,10 @@
 three minutes. Nothing is pushed to `main` without Rishi's explicit ✅ (root guardrail: deploy).
 Rewritten 2026-10-22; the Cloudflare Pages plan this file used to describe was never used.
 
+> **Moving to Cloudflare Pages (decided 2026-10-22, in progress):** Vercel Hobby is non-commercial only.
+> The steps, records and rollback are in `CLOUDFLARE-MOVE.md`. This file describes Vercel until that move
+> reaches its last step; then it is rewritten for Cloudflare.
+
 ## How it is wired
 
 | Piece | Where |
@@ -14,7 +18,7 @@ Rewritten 2026-10-22; the Cloudflare Pages plan this file used to describe was n
 | Production gate | Vercel sets `VERCEL_ENV=production`, which makes `build.py` run the full launch gate. Any error fails the build, and the last good deploy keeps serving. |
 | Domain | Namecheap DNS: `A @ 216.198.79.1`, `CNAME www` to Vercel. Primary is `www`; the bare domain 308s to it. |
 | Mail | Zoho Mail on the same domain (MX, SPF, DKIM, DMARC at Namecheap). DNS changes must keep those records. |
-| Free Project Map | Email compose links only (Gmail, Outlook, mailto, Copy). There is no server form on Vercel: `functions/api/request.js` was written for Cloudflare and `/api/request` returns 404. |
+| Free Project Map | Email compose links only (Gmail, Outlook, mailto, Copy). There is no server form: the old Cloudflare handler is parked in `parked/functions/api/request.js` and is not deployed, so `/api/request` returns 404. |
 | Reading view | The classic site is vendored in `classic/` and built into `dist/read/` by `build.py` (noindex, canonical to the brain pages). |
 
 ## Before every push to main
