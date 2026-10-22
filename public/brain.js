@@ -202,7 +202,9 @@
     if(Math.abs(lit-beam)<.01)beam=lit;
     var R=size*.95,floorY=cy+size*.99,ox=cx,oy=-8,under=1;
     if(lampX!==null){
-      under=clamp(1-Math.abs(cx-lampX)/(size*.75),0,1);var drop=canvasTop+cy-size*.93-18-48-switchBottom;
+      // Lit only while the brain sits on the lamp's straight line down: full within 8% of its size, dark past
+      // 22%. The old wide falloff left a faint ray beside a pulled-up lamp (Rishi 2026-10-22, "Your month").
+      under=clamp((.22-Math.abs(cx-lampX)/size)/.14,0,1);under=under*under*(3-2*under);var drop=canvasTop+cy-size*.93-18-48-switchBottom;
       var cord=10+under*Math.max(0,drop-10);
       pendant.style.transform='translate('+lampX+'px,'+switchBottom+'px)';cordEl.style.height=cord+'px';
       // The light comes from the lamp's mouth while the brain is under it.
