@@ -82,3 +82,7 @@ www.cortexforinteriors.com. Steps marked **(Rishi)** are his hand: accounts, pus
 
 - 2026-10-22: steps 1 to 6 done (main `1e8152c`; www on Cloudflare, certificate valid to 2027-01-20).
   Step 7 redirect tried and reverted (above). Inbound mail verified after the switch.
+- 2026-10-22: step 7 done by the nameserver move. All 9 records compared on Cloudflare's servers before the
+  switch (identical, DKIM included); zone Active; mail sent and received both ways. Bare domain added to the
+  Pages project and redirected to www by a Single Redirect (301, path and query kept). Step 8 done (sitemap
+  resubmitted). DEPLOY.md rewritten for Cloudflare. Left: step 9 (Vercel removal, then delete `vercel.json`).
