@@ -30,7 +30,34 @@ for chapter in range(8):
  candidates=[(i,p) for i,p in enumerate(nodes) if i not in hubs]
  hub=min(candidates,key=lambda item: abs((-item[1][0]*math.sin(angle)+item[1][2]*math.cos(angle))-.7)+abs(item[1][1]-(-.25 if chapter%2 else .15))*.7)[0]
  hubs.append(hub)
-shape={'nodes':nodes,'edges':edges,'hubs':hubs,'contours':[],'folds':[]}
+# The site brain (Rishi 2026-10-22): a perfect sphere read as a knowledge graph. Nodes sit on an even
+# Fibonacci lattice with a little deterministic drift; each joins its three nearest neighbours, and about
+# one in nine also reaches a farther node on the surface, so it reads as a graph rather than a mesh.
+# The logo below still uses the lobed volume above, unchanged.
+sphere=[]
+count=280
+for i in range(count):
+ y=1-2*(i+.5)/count
+ ring=math.sqrt(1-y*y)
+ theta=i*math.pi*(3-math.sqrt(5))+.11*math.sin(i*1.7)
+ lift=.013*math.sin(i*2.9)
+ sphere.append([round(.9*ring*math.cos(theta),5),round(.9*(y+lift),5),round(.9*ring*math.sin(theta),5)])
+links=set()
+for i,p in enumerate(sphere):
+ near=sorted((math.dist(p,q),j) for j,q in enumerate(sphere) if i!=j)
+ for d,j in near[:3]:links.add(tuple(sorted((i,j))))
+ if i%9==4:links.add(tuple(sorted((i,near[5+i%3][1]))))
+links=sorted(links)
+degree=[0]*count
+for a,b in links:degree[a]+=1;degree[b]+=1
+centres=[]
+# Each chapter's hub faces the viewer just right of centre at that chapter's settled rotation.
+def facing(p,angle):return (p[0]*math.cos(angle)+p[2]*math.sin(angle),-p[0]*math.sin(angle)+p[2]*math.cos(angle))
+for chapter in range(8):
+ angle=.25+chapter*.95
+ candidates=[(i,p) for i,p in enumerate(sphere) if i not in centres and degree[i]==3]
+ centres.append(min(candidates,key=lambda item: abs(facing(item[1],angle)[1]-.82)+abs(facing(item[1],angle)[0]-.25)*.8+abs(item[1][1]-(-.2 if chapter%2 else .2))*.7)[0])
+shape={'nodes':sphere,'edges':links,'hubs':centres,'contours':[],'folds':[]}
 (root/'public/brain-shape.js').write_text('window.CortexBrainShape='+json.dumps(shape)+';',encoding='utf-8')
 (root/'public/brain-geometry.json').write_text(json.dumps(shape),encoding='utf-8')
 # The logo is an optical front projection of the same lobed volume.

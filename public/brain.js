@@ -4,8 +4,9 @@
   var body = document.body, root = document.documentElement;
   var themeButton = document.querySelector('.theme-toggle');
   // Lamplight: the switch is the theme. Lights on is chalk and gold; lights off is black and gold, with the
-  // pendant under the switch lit and shining on the brain.
-  var lampLabel = themeButton.querySelector('.lamp-label'), pendant = themeButton.querySelector('.pendant'), switching = 0;
+  // pendant that hangs from the switch lit and shining on the brain.
+  var lampLabel = themeButton.querySelector('.lamp-label'), pendant = document.querySelector('.pendant'), switching = 0;
+  var cordEl = pendant && pendant.querySelector('.pendant-cord');
   function updateTheme() {
     var darkNow = root.dataset.theme === 'dark';
     lampLabel.textContent = darkNow ? 'Lights on' : 'Lights off';
@@ -79,7 +80,12 @@
   var links = Array.from(nav.querySelectorAll('a'));
   var enabled = false, active = 0, raf = 0, metrics = [], range = 1, w = 0, h = 0;
   var ink, accent, sage, line, dark, glow;
-  var hits = [], displayY = null, lastFrame = 0, beam = null, bulb = null;
+  var hits = [], displayY = null, lastFrame = 0, beam = null, lampX = null, canvasTop = 0, switchBottom = 0;
+  // A soft gold glow, stamped behind each lit node at night (cheaper than a canvas shadow per node).
+  var sprite = document.createElement('canvas'); sprite.width = sprite.height = 64;
+  (function () { var g = sprite.getContext('2d'), r = g.createRadialGradient(32, 32, 0, 32, 32, 32);
+    r.addColorStop(0, 'rgba(255,236,190,1)'); r.addColorStop(.25, 'rgba(242,201,119,.5)'); r.addColorStop(1, 'rgba(242,201,119,0)');
+    g.fillStyle = r; g.fillRect(0, 0, 64, 64); })();
   var clamp = model.clamp;
   var shape=window.CortexBrainShape;
   if(!shape) return;
@@ -122,9 +128,17 @@
     contents.forEach(function(c,i) { c.style.marginTop=Math.max(0,(available[i]-heights[i])/2)+'px'; });
     w=canvas.clientWidth;h=canvas.clientHeight;
     var dpr=Math.min(devicePixelRatio||1,1.7);canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);
-    // Where the pendant's bulb sits on the canvas (the bulb is 96.5 of the drawing's 110 units down).
-    var pr=pendant&&pendant.getBoundingClientRect(),cr=canvas.getBoundingClientRect();
-    bulb=pr&&pr.width?{x:pr.left+pr.width/2-cr.left,y:pr.top+pr.height*96.5/110-cr.top}:null;
+    // The lamp hangs where the brain rests most often on this page (the largest group of chapter centres
+    // within 16px), and the switch moves there, kept clear of the nav on the left and the tools on the right.
+    lampX=null;canvasTop=canvas.getBoundingClientRect().top;
+    if(w>700&&pendant){
+      var xs=chapters.map(function(s,k){return pose(k).x;}),group=[];
+      xs.forEach(function(x){var near=xs.filter(function(y){return Math.abs(y-x)<16;});if(near.length>group.length)group=near;});
+      var centre=group.reduce(function(a,b){return a+b;},0)/group.length;
+      var left=document.querySelector('.site-nav').getBoundingClientRect().right+40,right=document.querySelector('.display-tools').getBoundingClientRect().left-40;
+      lampX=clamp(centre,left,Math.max(left,right));root.style.setProperty('--lamp-x',lampX+'px');
+      switchBottom=themeButton.getBoundingClientRect().bottom;
+    }
     if (preserve && old) window.scrollTo(0,metrics[old.index].start+Math.min(old.read,metrics[old.index].read)+(old.read?metrics[old.index].hold*.25:0));
     schedule();
   }
@@ -169,8 +183,7 @@
     var cut=from.cut+(to.cut-from.cut)*t;
     ctx.beginPath();if(w<701)ctx.rect(0,0,w,from.band);else ctx.rect(cut,0,w-cut,h-120);ctx.clip();
     var points=nodes.map(function(p){
-      // Depth is stretched to match the width (0.84 vs 0.91), so the outline does not narrow when side-on.
-      var pz=p[2]*1.083,x=p[0]*Math.cos(angle)+pz*Math.sin(angle),z=-p[0]*Math.sin(angle)+pz*Math.cos(angle);
+      var x=p[0]*Math.cos(angle)+p[2]*Math.sin(angle),z=-p[0]*Math.sin(angle)+p[2]*Math.cos(angle);
       var y=p[1]*Math.cos(tilt)-z*Math.sin(tilt);z=p[1]*Math.sin(tilt)+z*Math.cos(tilt);
       var perspective=7/(7-z);
       return {x:cx+x*size*perspective,y:cy+y*size*perspective,z:z,r:perspective};
@@ -181,26 +194,40 @@
       visible.sort(function(a,b){return (Math.abs(a.p.x-(cut+(w-cut)*.5))+Math.abs(a.p.y-h*.46)*.5-a.p.z*30)-(Math.abs(b.p.x-(cut+(w-cut)*.5))+Math.abs(b.p.y-h*.46)*.5-b.p.z*30);});
       if(visible.length)anchor=visible[0].j;
     }
-    // The pendant: at night it fades up and throws a cone of light onto the brain, wherever the brain sits.
+    // The pendant: its cord stretches each frame to just above the brain, and pulls up when the brain moves
+    // away (dense chapters). At night the lamp fades up, lights the brain from above and pools on the floor.
     var lit=dark?1:0;
     if(beam===null||motion.matches)beam=lit;else beam+=(lit-beam)*(1-Math.exp(-Math.max(16,dt)/260));
     if(Math.abs(lit-beam)<.01)beam=lit;
-    var R=size*.95,ox=bulb?bulb.x:Math.min(w-30,cx+R*1.15),oy=bulb?bulb.y:-8;
-    var lx=ox-cx,ly=oy-cy,ld=Math.hypot(lx,ly)||1;lx/=ld;ly/=ld;
-    if(beam>.01){
-      // A soft-edged cone (blurred where the browser supports canvas filters), kept inside the brain's slice.
-      var reach=ld+R*.9,nx=-ly,ny=lx,spread=R*.92;ctx.filter='blur('+Math.round(R*.07)+'px)';
-      var cone=ctx.createLinearGradient(ox,oy,ox-lx*reach,oy-ly*reach);
-      cone.addColorStop(0,'rgba(255,226,160,'+(.30*beam)+')');cone.addColorStop(ld/reach,'rgba(242,201,119,'+(.11*beam)+')');cone.addColorStop(1,'rgba(242,201,119,0)');
-      ctx.fillStyle=cone;ctx.beginPath();
-      ctx.moveTo(ox+nx*9,oy+ny*9);ctx.lineTo(ox-lx*reach+nx*spread,oy-ly*reach+ny*spread);
-      ctx.lineTo(ox-lx*reach-nx*spread,oy-ly*reach-ny*spread);ctx.lineTo(ox-nx*9,oy-ny*9);ctx.closePath();ctx.fill();ctx.filter='none';
-      var pool=ctx.createRadialGradient(cx+lx*R*.3,cy+ly*R*.3,0,cx,cy,R*1.3);
-      pool.addColorStop(0,'rgba(242,201,119,'+(.13*beam)+')');pool.addColorStop(1,'rgba(242,201,119,0)');
-      ctx.fillStyle=pool;ctx.fillRect(cx-R*1.4,cy-R*1.4,R*2.8,R*2.8);
+    var R=size*.95,floorY=cy+size*.99,ox=cx,oy=-8;
+    if(lampX!==null){
+      var under=clamp(1-Math.abs(cx-lampX)/(size*.75),0,1),drop=canvasTop+cy-size*.93-18-50-switchBottom;
+      var cord=10+under*Math.max(0,drop-10);
+      pendant.style.transform='translate('+lampX+'px,'+switchBottom+'px)';cordEl.style.height=cord+'px';
+      // Light comes from the lamp while the brain is under it; when the lamp pulls up, from straight above.
+      ox=cx+(lampX-cx)*under;oy=-8+(switchBottom+cord+44.6-canvasTop+8)*under;
     }
-    // How squarely each point faces the lamp: the side towards the light glows brighter.
-    function face(p){return clamp(.5+.5*((p.x-cx)*lx+(p.y-cy)*ly)/R,0,1);}
+    var ux=cx-ox,uy=cy-oy,ud=Math.hypot(ux,uy)||1;ux/=ud;uy/=ud;
+    var lx=-ux,ly=-uy;
+    if(beam>.01){
+      // A soft-edged cone from the shade's mouth (blurred where the browser supports canvas filters).
+      var reach=ud+R*1.02,nx=-uy,ny=ux,spread=R*1.02;ctx.filter='blur('+Math.round(R*.06)+'px)';
+      var cone=ctx.createLinearGradient(ox,oy,ox+ux*reach,oy+uy*reach);
+      cone.addColorStop(0,'rgba(255,230,170,'+(.30*beam)+')');cone.addColorStop(ud/reach,'rgba(242,201,119,'+(.11*beam)+')');cone.addColorStop(1,'rgba(242,201,119,0)');
+      ctx.fillStyle=cone;ctx.beginPath();
+      ctx.moveTo(ox+nx*24,oy+ny*24);ctx.lineTo(ox+ux*reach+nx*spread,oy+uy*reach+ny*spread);
+      ctx.lineTo(ox+ux*reach-nx*spread,oy+uy*reach-ny*spread);ctx.lineTo(ox-nx*24,oy-ny*24);ctx.closePath();ctx.fill();ctx.filter='none';
+      var pool=ctx.createRadialGradient(cx,cy-R*.35,0,cx,cy,R*1.3);
+      pool.addColorStop(0,'rgba(242,201,119,'+(.12*beam)+')');pool.addColorStop(1,'rgba(242,201,119,0)');
+      ctx.fillStyle=pool;ctx.fillRect(cx-R*1.4,cy-R*1.4,R*2.8,R*2.8);
+      // The light that gets through lands on the floor under the brain as a bright, flattened pool.
+      ctx.save();ctx.translate(cx,floorY);ctx.scale(1,.15);
+      var floor=ctx.createRadialGradient(0,0,0,0,0,R*1.05);
+      floor.addColorStop(0,'rgba(255,232,176,'+(.5*beam)+')');floor.addColorStop(.35,'rgba(242,201,119,'+(.2*beam)+')');floor.addColorStop(1,'rgba(242,201,119,0)');
+      ctx.fillStyle=floor;ctx.fillRect(-R*1.1,-R*1.1,R*2.2,R*2.2);ctx.restore();
+    }
+    // How much light each point gets: the side facing the lamp, plus a bounce from the floor pool underneath.
+    function face(p){var bounce=clamp(((p.y-cy)/R-.45)/.5,0,1)*.5;return clamp(.5+.5*((p.x-cx)*lx+(p.y-cy)*ly)/R+bounce,0,1);}
     var names2=(branches[path]||[])[i]||[];
     var neighbours=edges.filter(function(e){return e[0]===anchor||e[1]===anchor;}).map(function(e){return e[0]===anchor?e[1]:e[0];});
     neighbours.sort(function(a,b){return a-b;});neighbours=neighbours.slice(0,Math.max(3,names2.length));
@@ -217,11 +244,16 @@
       var depth=clamp((p.z+.9)/1.8,0,1);
       var shine=dark?beam*face(p):0;
       ctx.globalAlpha=opacity*(hot?1:.08+.34*depth+shine*.5);
-      ctx.shadowColor=glow;ctx.shadowBlur=dark&&hot?(hub?20:9):(shine>.55&&j%4===0?7*shine:0);
+      ctx.shadowColor=glow;ctx.shadowBlur=dark&&hot?(hub?20:9):0;
       var radius=(hub?6.8:hot?4.6:j%5===0?3.7:2)*p.r*clamp(size/230,.42,1);
       var bead=ctx.createRadialGradient(p.x-radius*.35,p.y-radius*.4,radius*.06,p.x,p.y,radius);
       bead.addColorStop(0,hot? (dark?'white':accent): (dark?'#FFF1C8':ink));bead.addColorStop(.42,hot||shine>.35?accent:ink);bead.addColorStop(1,hot?accent:line);ctx.fillStyle=bead;
       ctx.beginPath();ctx.arc(p.x,p.y,radius,0,Math.PI*2);ctx.fill();
+      if(shine>.2){var halo=radius*(j%5===0?5.5:4.2);ctx.globalCompositeOperation='lighter';ctx.globalAlpha=opacity*shine*(.25+.4*depth);
+        ctx.drawImage(sprite,p.x-halo,p.y-halo,halo*2,halo*2);ctx.globalCompositeOperation='source-over';}
+      // The lower half shows faintly in the floor, as a reflection below the pool.
+      if(beam>.01&&p.y>cy+R*.3){var my=floorY+(floorY-p.y)*.26;ctx.globalAlpha=opacity*beam*.3*clamp((p.y-cy)/R,0,1)*depth;
+        ctx.fillStyle=accent;ctx.beginPath();ctx.arc(p.x,my,radius*.75,0,Math.PI*2);ctx.fill();}
     });
     ctx.shadowBlur=0;ctx.globalAlpha=1;hits=[];
     if(wide<.2 && w>700){

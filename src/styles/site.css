@@ -509,58 +509,69 @@ body::before { content: ''; position: fixed; left: 50%; top: 0; width: min(1400p
 .lights-switching .tier, .lights-switching .node-nav, .lights-switching .journey-bottom, .lights-switching .btn,
 .lights-switching h1, .lights-switching h2, .lights-switching h3, .lights-switching p { transition: background-color .8s ease, color .8s ease, border-color .8s ease; }
 .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-/* The switch: a bronze pill with a pearl knob by day; black and gold with a gold knob at night. */
+/* The switch (Rishi 2026-10-22): a brushed-brass wall plate with a dolly toggle, as an interior designer
+   would specify it. Lever up is lights on (chalk); lever down is lights off (black and gold, pendant lit).
+   On desktop it sits in the header directly above where the brain most often rests, and the pendant
+   hangs from it. */
 :root {
-  --switch-track: linear-gradient(180deg, #7A5F35, #A8854A 55%, #8C6C3B);
-  --switch-edge: #6B5230;
-  --switch-shadow: inset 0 2px 5px #2B1E0E66, 0 3px 10px #1E191322;
-  --switch-knob: radial-gradient(circle at 35% 30%, #FFFFFF, #EDE6D8 55%, #CFC4B0);
-  --knob-shadow: 0 2px 5px #2B1E0E59, inset 0 -1px 2px #8C7B6040;
-  --switch-sun: #F6E3B4;
-  --pendant-cord: #6B5230;
-  --pendant-bulb: #E7DCC6;
-  --pendant-glow: none;
+  --plate: repeating-linear-gradient(90deg, #FFFFFF14 0 1px, #00000008 1px 3px), linear-gradient(135deg, #EDD6A0, #C29B55 46%, #8C6A30);
+  --plate-edge: #7A5A28;
+  --plate-shadow: inset 0 1px 0 #FFFFFF73, inset 0 -1px 0 #0000002E, 0 3px 9px #1E191333;
+  --screw: radial-gradient(circle at 38% 34%, #F6E3B4, #9C7838 60%, #5E4520);
+  --rose: radial-gradient(circle at 40% 35%, #F3DEA8, #A8854A 55%, #6B5230);
+  --lever: linear-gradient(90deg, #6B5230, #F0D9A0 45%, #B08A48 70%, #5E4520);
+  --lever-shadow: 0 3px 3px #2B1E0E59;
+  --rose-shadow: inset 0 1px 2px #2B1E0E59;
+  --cord: linear-gradient(90deg, #2B1E0E, #8C6C3B 50%, #2B1E0E);
+  --sheen: #FFF6DC;
+  --mouth: #E9DFCB;
+  --bulb: #F6F0E2;
+  --bulb-glow: none;
+  --shade-shadow: drop-shadow(0 6px 10px #1E191340);
 }
 :root[data-theme="dark"] {
-  --switch-track: linear-gradient(180deg, #0D0B09, #1A1511);
-  --switch-edge: #D4AF6A;
-  --switch-shadow: inset 0 2px 6px #000000AA, 0 0 14px #D4AF6A33;
-  --switch-knob: radial-gradient(circle at 35% 30%, #FFF1C8, #D4AF6A 50%, #8A6A2F);
-  --pendant-cord: #8A6A2F;
-  --pendant-bulb: #FFE7B0;
-  --pendant-glow: drop-shadow(0 0 6px #F2C977) drop-shadow(0 2px 14px #F2C977AA);
+  --plate: repeating-linear-gradient(90deg, #FFFFFF08 0 1px, #00000014 1px 3px), linear-gradient(135deg, #2E251B, #16120E 55%, #0D0B09);
+  --plate-edge: #D4AF6A;
+  --plate-shadow: inset 0 1px 0 #D4AF6A40, 0 0 14px #D4AF6A2E;
+  --cord: linear-gradient(90deg, #3E2C12, #C9A25C 50%, #3E2C12);
+  --mouth: #FFE9B8;
+  --bulb: #FFFFFF;
+  --bulb-glow: drop-shadow(0 0 6px #FFE7B0) drop-shadow(0 3px 18px #F2C977);
+  --shade-shadow: drop-shadow(0 0 18px #F2C97738);
 }
-.display-tools .lamp-switch { position: relative; padding: 0; border: 0; background: none; min-height: 0; border-radius: 99px; }
+.display-tools .lamp-switch { position: relative; padding: 0; border: 0; background: none; min-height: 0; border-radius: 5px; }
 .display-tools .lamp-switch:hover { border-color: transparent; }
-.display-tools .lamp-switch::after { inset: -7px -3px; }
-.switch-track { position: relative; display: block; width: 66px; height: 32px; border-radius: 99px; background: var(--switch-track); border: 1px solid var(--switch-edge); box-shadow: var(--switch-shadow); transition: border-color .6s ease, box-shadow .6s ease; }
-.switch-knob { position: absolute; top: 3px; left: 3px; width: 24px; height: 24px; border-radius: 50%; background: var(--switch-knob); box-shadow: var(--knob-shadow); transition: transform .55s cubic-bezier(.6,.05,.25,1); }
-.switch-icon { position: absolute; top: 7px; width: 16px; height: 16px; fill: none; stroke-width: 1.6; stroke-linecap: round; transition: opacity .5s ease; }
-.switch-sun { right: 8px; stroke: var(--switch-sun); }
-.switch-sun circle { fill: var(--switch-sun); stroke: none; }
-.switch-moon { left: 8px; stroke: var(--gold); opacity: 0; }
-:root[data-theme="dark"] .switch-knob { transform: translateX(34px); }
-:root[data-theme="dark"] .switch-sun { opacity: 0; }
-:root[data-theme="dark"] .switch-moon { opacity: 1; }
-.lamp-switch:focus-visible .switch-track { outline: 2px solid var(--accent); outline-offset: 3px; }
+.display-tools .lamp-switch::after { inset: -2px -8px; }
+.switch-plate { display: flex; flex-direction: column; align-items: center; justify-content: space-between; width: 30px; height: 46px; padding: 4px 0; box-sizing: border-box; border-radius: 4px; background: var(--plate); border: 1px solid var(--plate-edge); box-shadow: var(--plate-shadow); transition: box-shadow .6s ease, border-color .6s ease; }
+.switch-screw { position: relative; width: 5px; height: 5px; border-radius: 50%; background: var(--screw); }
+.switch-screw::after { content: ''; position: absolute; left: 1px; right: 1px; top: 2px; height: 1px; background: var(--plate-edge); transform: rotate(-30deg); }
+.switch-rose { display: grid; place-items: center; width: 15px; height: 15px; border-radius: 50%; background: var(--rose); box-shadow: var(--rose-shadow); }
+.switch-lever { width: 6px; height: 14px; border-radius: 3px; background: var(--lever); box-shadow: var(--lever-shadow); transform: translateY(-4px); transition: transform .45s cubic-bezier(.6,.05,.25,1); }
+:root[data-theme="dark"] .switch-lever { transform: translateY(4px); }
+.lamp-switch:hover .switch-plate { border-color: var(--accent); }
+.lamp-switch:focus-visible .switch-plate { outline: 2px solid var(--accent); outline-offset: 3px; }
 .lamp-switch:focus-visible { outline: 0; }
-/* The pendant hangs from the switch into the brain's space; at night its bulb lights the brain. */
-.pendant { display: none; position: absolute; top: calc(100% + 2px); left: 50%; width: 40px; height: 110px; margin-left: -20px; pointer-events: none; overflow: visible; }
+@media (min-width: 701px) {
+  body.journey-enabled .site-nav { margin-left: clamp(28px, 4vw, 72px); margin-right: auto; }
+  body.journey-enabled .lamp-switch { position: fixed; left: var(--lamp-x, 78vw); top: calc(var(--header-height, 92px) / 2); transform: translate(-50%, -50%); }
+}
+/* The pendant: a brass dome on a cord from the switch, stretched each frame to just above the brain. */
+.pendant { display: none; position: fixed; left: 0; top: 0; width: 64px; margin-left: -32px; pointer-events: none; transform: translate(-999px, 0); }
 body.journey-enabled .pendant { display: block; }
-.pendant-cord { stroke: var(--pendant-cord); stroke-width: 1.2; }
-.pendant-bulb { fill: var(--pendant-bulb); filter: var(--pendant-glow); transition: fill .6s ease; }
+.pendant-cord { display: block; width: 2px; height: 20px; margin: 0 auto; background: var(--cord); }
+.pendant-shade { display: block; width: 64px; height: 50px; margin-top: -1px; overflow: visible; filter: var(--shade-shadow); }
+.pendant-sheen { fill: none; stroke: var(--sheen); stroke-width: 1.4; stroke-linecap: round; opacity: .55; }
+.pendant-mouth { fill: var(--mouth); transition: fill .6s ease; }
+.pendant-bulb { fill: var(--bulb); filter: var(--bulb-glow); transition: fill .6s ease; }
 
 /* Tap targets: at least 44px tall without changing the visual layout. */
 .site-nav a:not(.btn), .display-tools button, .journey-link, .next-node, .text-link { position: relative; }
 .site-nav a:not(.btn)::after, .journey-link::after, .text-link::after { content: ''; position: absolute; inset: -13px -4px; }
 .display-tools button::after, .next-node::after { content: ''; position: absolute; inset: -5px 0; }
 @media (max-width: 700px) {
-  .switch-track { width: 56px; height: 28px; }
-  .switch-knob { width: 20px; height: 20px; }
-  :root[data-theme="dark"] .switch-knob { transform: translateX(28px); }
-  .switch-icon { top: 6px; width: 14px; height: 14px; }
-  .switch-sun { right: 6px; }
-  .switch-moon { left: 6px; }
+  .switch-plate { width: 26px; height: 40px; padding: 3px 0; }
+  .switch-rose { width: 13px; height: 13px; }
+  .switch-lever { height: 12px; }
   /* No room under the switch on phones (the nav row sits there); the brain still gets the light. */
   body.journey-enabled .pendant { display: none; }
 }
