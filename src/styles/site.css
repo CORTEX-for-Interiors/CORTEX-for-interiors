@@ -1,20 +1,23 @@
-/* Cortex Studio: chalk, graphite and mineral green.
+/* Cortex Studio: the Lamplight palette, gold on warm black or on chalk (Rishi 2026-10-22: the light
+   theme inherits the dark palette; only the black becomes the current light paper).
    Shared tokens, network cards and a native-scroll spatial brain journey. */
 :root {
   --paper: #F4F3EE;
   --paper-2: #E9ECE5;
   --surface: #FDFCF8;
-  --ink: #222725;
-  --ink-mid: #626D66;
-  --rule: #D8DDD6;
-  --accent: #435E55;
-  --on-accent: #FDFCF8;
-  --brass: #435E55;
-  --sage: #B9C7BB;
+  --ink: #1E1913;
+  --ink-mid: #6E6253;
+  --rule: #DCD3C3;
+  /* Gold deepened for text on chalk (5.2:1); buttons use the bright gold, as in the dark theme. */
+  --accent: #84601E;
+  --gold: #D4AF6A;
+  --on-accent: #0D0B09;
+  --brass: #B89148;
+  --sage: #8E3A4C;
   --bad: #9A3B22;
-  --shadow: #22272512;
-  --graph-line: #435E5566;
-  --graph-faint: #435E5512;
+  --shadow: #1E191314;
+  --graph-line: #A88A5566;
+  --graph-faint: #84601E12;
   --display: "Cormorant Garamond", Garamond, "Times New Roman", serif;
   --body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
   --gutter: clamp(20px, 4vw, 64px);
@@ -71,7 +74,7 @@ p { margin: 0 0 1em; max-width: 62ch; }
 }
 .btn:hover { background: var(--ink); color: var(--paper); }
 .btn:active { transform: translateY(1px) scale(0.99); }
-.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.btn.primary { background: var(--gold); border-color: var(--gold); color: var(--on-accent); }
 .btn.primary:hover { background: var(--ink); border-color: var(--ink); color: var(--paper); }
 .btn.small { padding: 11px 16px; font-size: 0.72rem; }
 .btn[disabled] { opacity: 0.6; cursor: progress; }
@@ -320,10 +323,10 @@ input, select, textarea { border-radius: 4px; }
 .end-note { font-size: 12px; margin: 24px 0 18px; color: var(--ink-mid); }
 .journey-contact { display: flex; flex-wrap: wrap; gap: 24px; font-size: 11px; }
 
-/* Lamplight (Rishi 2026-10-22): lights on keeps the chalk and mineral theme under a warm pendant
-   glow; lights off is warm black and gold, with oxblood as the one supporting color (lines only). */
+/* Lamplight (Rishi 2026-10-22): one gold palette. Lights on is chalk paper; lights off is warm black
+   and gold with the pendant lit over the brain; oxblood is the one supporting color (lines only). */
 :root {
-  --node-glow: #438D78;
+  --node-glow: #D4AF6A;
   --header-height: 92px;
   --lamp-glow: #FBE2B35C;
 }
@@ -335,6 +338,7 @@ input, select, textarea { border-radius: 4px; }
   --ink-mid: #BFB3A1;
   --rule: #332A21;
   --accent: #D4AF6A;
+  --gold: #D4AF6A;
   --on-accent: #0D0B09;
   --brass: #D4AF6A;
   --sage: #8E3A4C;
@@ -504,21 +508,61 @@ body::before { content: ''; position: fixed; left: 50%; top: 0; width: min(1400p
 .lights-switching body, .lights-switching .site-header, .lights-switching .node-card, .lights-switching .social-post,
 .lights-switching .tier, .lights-switching .node-nav, .lights-switching .journey-bottom, .lights-switching .btn,
 .lights-switching h1, .lights-switching h2, .lights-switching h3, .lights-switching p { transition: background-color .8s ease, color .8s ease, border-color .8s ease; }
-.display-tools .lamp { display: inline-flex; align-items: center; gap: 7px; }
-.lamp-icon { width: 16px; height: 16px; flex-shrink: 0; overflow: visible; }
-.lamp-cord { stroke: currentColor; stroke-width: 1.4; fill: none; }
-.lamp-shade { fill: currentColor; }
-.lamp-bulb { fill: var(--accent); transition: fill .5s ease; }
-:root[data-theme="dark"] .lamp-bulb { fill: var(--rule); }
-:root[data-theme="dark"] .display-tools .lamp { color: var(--accent); border-color: var(--accent); }
+.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+/* The switch: a bronze pill with a pearl knob by day; black and gold with a gold knob at night. */
+:root {
+  --switch-track: linear-gradient(180deg, #7A5F35, #A8854A 55%, #8C6C3B);
+  --switch-edge: #6B5230;
+  --switch-shadow: inset 0 2px 5px #2B1E0E66, 0 3px 10px #1E191322;
+  --switch-knob: radial-gradient(circle at 35% 30%, #FFFFFF, #EDE6D8 55%, #CFC4B0);
+  --knob-shadow: 0 2px 5px #2B1E0E59, inset 0 -1px 2px #8C7B6040;
+  --switch-sun: #F6E3B4;
+  --pendant-cord: #6B5230;
+  --pendant-bulb: #E7DCC6;
+  --pendant-glow: none;
+}
+:root[data-theme="dark"] {
+  --switch-track: linear-gradient(180deg, #0D0B09, #1A1511);
+  --switch-edge: #D4AF6A;
+  --switch-shadow: inset 0 2px 6px #000000AA, 0 0 14px #D4AF6A33;
+  --switch-knob: radial-gradient(circle at 35% 30%, #FFF1C8, #D4AF6A 50%, #8A6A2F);
+  --pendant-cord: #8A6A2F;
+  --pendant-bulb: #FFE7B0;
+  --pendant-glow: drop-shadow(0 0 6px #F2C977) drop-shadow(0 2px 14px #F2C977AA);
+}
+.display-tools .lamp-switch { position: relative; padding: 0; border: 0; background: none; min-height: 0; border-radius: 99px; }
+.display-tools .lamp-switch:hover { border-color: transparent; }
+.display-tools .lamp-switch::after { inset: -7px -3px; }
+.switch-track { position: relative; display: block; width: 66px; height: 32px; border-radius: 99px; background: var(--switch-track); border: 1px solid var(--switch-edge); box-shadow: var(--switch-shadow); transition: border-color .6s ease, box-shadow .6s ease; }
+.switch-knob { position: absolute; top: 3px; left: 3px; width: 24px; height: 24px; border-radius: 50%; background: var(--switch-knob); box-shadow: var(--knob-shadow); transition: transform .55s cubic-bezier(.6,.05,.25,1); }
+.switch-icon { position: absolute; top: 7px; width: 16px; height: 16px; fill: none; stroke-width: 1.6; stroke-linecap: round; transition: opacity .5s ease; }
+.switch-sun { right: 8px; stroke: var(--switch-sun); }
+.switch-sun circle { fill: var(--switch-sun); stroke: none; }
+.switch-moon { left: 8px; stroke: var(--gold); opacity: 0; }
+:root[data-theme="dark"] .switch-knob { transform: translateX(34px); }
+:root[data-theme="dark"] .switch-sun { opacity: 0; }
+:root[data-theme="dark"] .switch-moon { opacity: 1; }
+.lamp-switch:focus-visible .switch-track { outline: 2px solid var(--accent); outline-offset: 3px; }
+.lamp-switch:focus-visible { outline: 0; }
+/* The pendant hangs from the switch into the brain's space; at night its bulb lights the brain. */
+.pendant { display: none; position: absolute; top: calc(100% + 2px); left: 50%; width: 40px; height: 110px; margin-left: -20px; pointer-events: none; overflow: visible; }
+body.journey-enabled .pendant { display: block; }
+.pendant-cord { stroke: var(--pendant-cord); stroke-width: 1.2; }
+.pendant-bulb { fill: var(--pendant-bulb); filter: var(--pendant-glow); transition: fill .6s ease; }
 
 /* Tap targets: at least 44px tall without changing the visual layout. */
 .site-nav a:not(.btn), .display-tools button, .journey-link, .next-node, .text-link { position: relative; }
 .site-nav a:not(.btn)::after, .journey-link::after, .text-link::after { content: ''; position: absolute; inset: -13px -4px; }
 .display-tools button::after, .next-node::after { content: ''; position: absolute; inset: -5px 0; }
 @media (max-width: 700px) {
-  .lamp-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-  .display-tools .lamp { min-width: 44px; justify-content: center; }
+  .switch-track { width: 56px; height: 28px; }
+  .switch-knob { width: 20px; height: 20px; }
+  :root[data-theme="dark"] .switch-knob { transform: translateX(28px); }
+  .switch-icon { top: 6px; width: 14px; height: 14px; }
+  .switch-sun { right: 6px; }
+  .switch-moon { left: 6px; }
+  /* No room under the switch on phones (the nav row sits there); the brain still gets the light. */
+  body.journey-enabled .pendant { display: none; }
 }
 
 /* One project as an Instagram grid: six posts, sized to fit the screen without inner scrolling. */

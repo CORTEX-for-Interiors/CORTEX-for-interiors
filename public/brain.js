@@ -3,8 +3,9 @@
   'use strict';
   var body = document.body, root = document.documentElement;
   var themeButton = document.querySelector('.theme-toggle');
-  // Lamplight: the lamp is the theme switch. Lights on is the light theme, lights off is black and gold.
-  var lampLabel = themeButton.querySelector('.lamp-label'), switching = 0;
+  // Lamplight: the switch is the theme. Lights on is chalk and gold; lights off is black and gold, with the
+  // pendant under the switch lit and shining on the brain.
+  var lampLabel = themeButton.querySelector('.lamp-label'), pendant = themeButton.querySelector('.pendant'), switching = 0;
   function updateTheme() {
     var darkNow = root.dataset.theme === 'dark';
     lampLabel.textContent = darkNow ? 'Lights on' : 'Lights off';
@@ -78,7 +79,7 @@
   var links = Array.from(nav.querySelectorAll('a'));
   var enabled = false, active = 0, raf = 0, metrics = [], range = 1, w = 0, h = 0;
   var ink, accent, sage, line, dark, glow;
-  var hits = [], displayY = null, lastFrame = 0;
+  var hits = [], displayY = null, lastFrame = 0, beam = null, bulb = null;
   var clamp = model.clamp;
   var shape=window.CortexBrainShape;
   if(!shape) return;
@@ -121,6 +122,9 @@
     contents.forEach(function(c,i) { c.style.marginTop=Math.max(0,(available[i]-heights[i])/2)+'px'; });
     w=canvas.clientWidth;h=canvas.clientHeight;
     var dpr=Math.min(devicePixelRatio||1,1.7);canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);
+    // Where the pendant's bulb sits on the canvas (the bulb is 96.5 of the drawing's 110 units down).
+    var pr=pendant&&pendant.getBoundingClientRect(),cr=canvas.getBoundingClientRect();
+    bulb=pr&&pr.width?{x:pr.left+pr.width/2-cr.left,y:pr.top+pr.height*96.5/110-cr.top}:null;
     if (preserve && old) window.scrollTo(0,metrics[old.index].start+Math.min(old.read,metrics[old.index].read)+(old.read?metrics[old.index].hold*.25:0));
     schedule();
   }
@@ -177,6 +181,26 @@
       visible.sort(function(a,b){return (Math.abs(a.p.x-(cut+(w-cut)*.5))+Math.abs(a.p.y-h*.46)*.5-a.p.z*30)-(Math.abs(b.p.x-(cut+(w-cut)*.5))+Math.abs(b.p.y-h*.46)*.5-b.p.z*30);});
       if(visible.length)anchor=visible[0].j;
     }
+    // The pendant: at night it fades up and throws a cone of light onto the brain, wherever the brain sits.
+    var lit=dark?1:0;
+    if(beam===null||motion.matches)beam=lit;else beam+=(lit-beam)*(1-Math.exp(-Math.max(16,dt)/260));
+    if(Math.abs(lit-beam)<.01)beam=lit;
+    var R=size*.95,ox=bulb?bulb.x:Math.min(w-30,cx+R*1.15),oy=bulb?bulb.y:-8;
+    var lx=ox-cx,ly=oy-cy,ld=Math.hypot(lx,ly)||1;lx/=ld;ly/=ld;
+    if(beam>.01){
+      // A soft-edged cone (blurred where the browser supports canvas filters), kept inside the brain's slice.
+      var reach=ld+R*.9,nx=-ly,ny=lx,spread=R*.92;ctx.filter='blur('+Math.round(R*.07)+'px)';
+      var cone=ctx.createLinearGradient(ox,oy,ox-lx*reach,oy-ly*reach);
+      cone.addColorStop(0,'rgba(255,226,160,'+(.30*beam)+')');cone.addColorStop(ld/reach,'rgba(242,201,119,'+(.11*beam)+')');cone.addColorStop(1,'rgba(242,201,119,0)');
+      ctx.fillStyle=cone;ctx.beginPath();
+      ctx.moveTo(ox+nx*9,oy+ny*9);ctx.lineTo(ox-lx*reach+nx*spread,oy-ly*reach+ny*spread);
+      ctx.lineTo(ox-lx*reach-nx*spread,oy-ly*reach-ny*spread);ctx.lineTo(ox-nx*9,oy-ny*9);ctx.closePath();ctx.fill();ctx.filter='none';
+      var pool=ctx.createRadialGradient(cx+lx*R*.3,cy+ly*R*.3,0,cx,cy,R*1.3);
+      pool.addColorStop(0,'rgba(242,201,119,'+(.13*beam)+')');pool.addColorStop(1,'rgba(242,201,119,0)');
+      ctx.fillStyle=pool;ctx.fillRect(cx-R*1.4,cy-R*1.4,R*2.8,R*2.8);
+    }
+    // How squarely each point faces the lamp: the side towards the light glows brighter.
+    function face(p){return clamp(.5+.5*((p.x-cx)*lx+(p.y-cy)*ly)/R,0,1);}
     var names2=(branches[path]||[])[i]||[];
     var neighbours=edges.filter(function(e){return e[0]===anchor||e[1]===anchor;}).map(function(e){return e[0]===anchor?e[1]:e[0];});
     neighbours.sort(function(a,b){return a-b;});neighbours=neighbours.slice(0,Math.max(3,names2.length));
@@ -184,17 +208,19 @@
     edges.forEach(function(edge){
       var p=points[edge[0]],q=points[edge[1]],hot=connected.has(edge[0])&&connected.has(edge[1]);
       var depth=clamp(((p.z+q.z)*.5+.9)/1.8,0,1);
-      ctx.globalAlpha=opacity*(hot?.98:(dark?.07+.24*depth:.045+.19*depth));ctx.strokeStyle=hot?accent:(dark?line:ink);ctx.lineWidth=hot?2.1:.65+depth*.45;
+      var shine=dark?beam*face({x:(p.x+q.x)/2,y:(p.y+q.y)/2}):0;
+      ctx.globalAlpha=opacity*(hot?.98:(dark?.06+.2*depth+shine*(.12+.3*depth):.045+.19*depth));ctx.strokeStyle=hot||shine>.35?accent:(dark?line:ink);ctx.lineWidth=hot?2.1:.65+depth*.45;
       ctx.shadowColor=glow;ctx.shadowBlur=dark&&hot?7:0;ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(q.x,q.y);ctx.stroke();
     });
     points.map(function(p,j){return {p:p,j:j};}).sort(function(a,b){return a.p.z-b.p.z;}).forEach(function(item){
       var p=item.p,j=item.j,hot=connected.has(j),hub=j===anchor;
       var depth=clamp((p.z+.9)/1.8,0,1);
-      ctx.globalAlpha=opacity*(hot?1:.10+.40*depth);
-      ctx.shadowColor=glow;ctx.shadowBlur=dark&&hot?(hub?20:9):0;
+      var shine=dark?beam*face(p):0;
+      ctx.globalAlpha=opacity*(hot?1:.08+.34*depth+shine*.5);
+      ctx.shadowColor=glow;ctx.shadowBlur=dark&&hot?(hub?20:9):(shine>.55&&j%4===0?7*shine:0);
       var radius=(hub?6.8:hot?4.6:j%5===0?3.7:2)*p.r*clamp(size/230,.42,1);
       var bead=ctx.createRadialGradient(p.x-radius*.35,p.y-radius*.4,radius*.06,p.x,p.y,radius);
-      bead.addColorStop(0,hot? (dark?'white':accent): (dark?'white':ink));bead.addColorStop(.42,hot?accent:ink);bead.addColorStop(1,hot?accent:line);ctx.fillStyle=bead;
+      bead.addColorStop(0,hot? (dark?'white':accent): (dark?'#FFF1C8':ink));bead.addColorStop(.42,hot||shine>.35?accent:ink);bead.addColorStop(1,hot?accent:line);ctx.fillStyle=bead;
       ctx.beginPath();ctx.arc(p.x,p.y,radius,0,Math.PI*2);ctx.fill();
     });
     ctx.shadowBlur=0;ctx.globalAlpha=1;hits=[];
@@ -228,7 +254,7 @@
       });
     }
     ctx.restore();
-    if(displayY!==targetY)schedule();
+    if(displayY!==targetY||beam!==lit)schedule();
   }
   function schedule(){if(!raf&&enabled)raf=requestAnimationFrame(draw);}
   function mode(reading){
