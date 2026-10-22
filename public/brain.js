@@ -200,31 +200,34 @@
     var lit=dark?1:0;
     if(beam===null||motion.matches)beam=lit;else beam+=(lit-beam)*(1-Math.exp(-Math.max(16,dt)/260));
     if(Math.abs(lit-beam)<.01)beam=lit;
-    var R=size*.95,floorY=cy+size*.99,ox=cx,oy=-8;
+    var R=size*.95,floorY=cy+size*.99,ox=cx,oy=-8,under=1;
     if(lampX!==null){
-      var under=clamp(1-Math.abs(cx-lampX)/(size*.75),0,1),drop=canvasTop+cy-size*.93-18-48-switchBottom;
+      under=clamp(1-Math.abs(cx-lampX)/(size*.75),0,1);var drop=canvasTop+cy-size*.93-18-48-switchBottom;
       var cord=10+under*Math.max(0,drop-10);
       pendant.style.transform='translate('+lampX+'px,'+switchBottom+'px)';cordEl.style.height=cord+'px';
-      // Light comes from the lamp while the brain is under it; when the lamp pulls up, from straight above.
+      // The light comes from the lamp's mouth while the brain is under it.
       ox=cx+(lampX-cx)*under;oy=-8+(switchBottom+cord+44.7-canvasTop+8)*under;
+      pendant.classList.toggle('is-up',under<.5);
     }
+    // The lamp only glows while it hangs over the brain: pulled up, its light goes out (Rishi 2026-10-22).
+    var glowing=beam*under;
     var ux=cx-ox,uy=cy-oy,ud=Math.hypot(ux,uy)||1;ux/=ud;uy/=ud;
     var lx=-ux,ly=-uy;
-    if(beam>.01){
+    if(glowing>.01){
       // A soft-edged cone from the shade's mouth (blurred where the browser supports canvas filters).
       var reach=ud+R*.9,nx=-uy,ny=ux,spread=R*.85;ctx.filter='blur('+Math.round(R*.06)+'px)';
       var cone=ctx.createLinearGradient(ox,oy,ox+ux*reach,oy+uy*reach);
-      cone.addColorStop(0,'rgba(255,230,170,'+(.16*beam)+')');cone.addColorStop(ud/reach,'rgba(242,201,119,'+(.05*beam)+')');cone.addColorStop(1,'rgba(242,201,119,0)');
+      cone.addColorStop(0,'rgba(255,230,170,'+(.16*glowing)+')');cone.addColorStop(ud/reach,'rgba(242,201,119,'+(.05*glowing)+')');cone.addColorStop(1,'rgba(242,201,119,0)');
       ctx.fillStyle=cone;ctx.beginPath();
       ctx.moveTo(ox+nx*9,oy+ny*9);ctx.lineTo(ox+ux*reach+nx*spread,oy+uy*reach+ny*spread);
       ctx.lineTo(ox+ux*reach-nx*spread,oy+uy*reach-ny*spread);ctx.lineTo(ox-nx*9,oy-ny*9);ctx.closePath();ctx.fill();ctx.filter='none';
       var pool=ctx.createRadialGradient(cx,cy-R*.35,0,cx,cy,R*1.3);
-      pool.addColorStop(0,'rgba(242,201,119,'+(.05*beam)+')');pool.addColorStop(1,'rgba(242,201,119,0)');
+      pool.addColorStop(0,'rgba(242,201,119,'+(.05*glowing)+')');pool.addColorStop(1,'rgba(242,201,119,0)');
       ctx.fillStyle=pool;ctx.fillRect(cx-R*1.4,cy-R*1.4,R*2.8,R*2.8);
       // The light that gets through lands on the floor under the brain as a bright, flattened pool.
       ctx.save();ctx.translate(cx,floorY);ctx.scale(1,.15);
       var floor=ctx.createRadialGradient(0,0,0,0,0,R*.85);
-      floor.addColorStop(0,'rgba(255,232,176,'+(.28*beam)+')');floor.addColorStop(.35,'rgba(242,201,119,'+(.1*beam)+')');floor.addColorStop(1,'rgba(242,201,119,0)');
+      floor.addColorStop(0,'rgba(255,232,176,'+(.28*glowing)+')');floor.addColorStop(.35,'rgba(242,201,119,'+(.1*glowing)+')');floor.addColorStop(1,'rgba(242,201,119,0)');
       ctx.fillStyle=floor;ctx.fillRect(-R*1.1,-R*1.1,R*2.2,R*2.2);ctx.restore();
     }
     // How much light each point gets: the side facing the lamp, plus a bounce from the floor pool underneath.
@@ -239,7 +242,7 @@
     edges.forEach(function(edge){
       var p=points[edge[0]],q=points[edge[1]],hot=connected.has(edge[0])&&connected.has(edge[1]);
       var depth=clamp(((p.z+q.z)*.5+.9)/1.8,0,1);
-      var shine=dark?beam*face({x:(p.x+q.x)/2,y:(p.y+q.y)/2}):0;
+      var shine=dark?glowing*face({x:(p.x+q.x)/2,y:(p.y+q.y)/2}):0;
       ctx.globalAlpha=opacity*(hot?.95:(dark?.12+.38*depth+.14*shine:.1+.42*depth));
       ctx.strokeStyle=hot?accent:netLine;ctx.lineWidth=hot?1.8:.55+depth*.4;
       ctx.shadowColor=glow;ctx.shadowBlur=dark&&hot?4:0;ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(q.x,q.y);ctx.stroke();
@@ -249,7 +252,7 @@
     points.map(function(p,j){return {p:p,j:j};}).sort(function(a,b){return a.p.z-b.p.z;}).forEach(function(item){
       var p=item.p,j=item.j,hot=connected.has(j),hub=j===anchor;
       var depth=clamp((p.z+.9)/1.8,0,1);
-      var shine=dark?beam*face(p):0;
+      var shine=dark?glowing*face(p):0;
       var radius=(hub?5.6:hot?3.8:j%7===0?2.8:1.8)*p.r*scale;
       if(dark&&depth>.45&&(hot||shine>.35)){var halo=radius*(hot?4:3);ctx.globalCompositeOperation='lighter';ctx.globalAlpha=opacity*(hot?.35:.12*shine)*depth;
         ctx.drawImage(sprite,p.x-halo,p.y-halo,halo*2,halo*2);ctx.globalCompositeOperation='source-over';}
@@ -257,7 +260,7 @@
       ctx.fillStyle=hot?accent:netNode;ctx.beginPath();ctx.arc(p.x,p.y,radius,0,Math.PI*2);ctx.fill();
       if(hub){ctx.globalAlpha=opacity;ctx.lineWidth=1.2;ctx.strokeStyle=accent;ctx.beginPath();ctx.arc(p.x,p.y,radius+4*scale+2,0,Math.PI*2);ctx.stroke();}
       // The lower half shows faintly in the floor, as a reflection below the pool.
-      if(beam>.01&&p.y>cy+R*.3){var my=floorY+(floorY-p.y)*.26;ctx.globalAlpha=opacity*beam*.18*clamp((p.y-cy)/R,0,1)*depth;
+      if(glowing>.01&&p.y>cy+R*.3){var my=floorY+(floorY-p.y)*.26;ctx.globalAlpha=opacity*glowing*.18*clamp((p.y-cy)/R,0,1)*depth;
         ctx.fillStyle=netNode;ctx.beginPath();ctx.arc(p.x,my,radius*.7,0,Math.PI*2);ctx.fill();}
     });
     ctx.shadowBlur=0;ctx.globalAlpha=1;hits=[];
