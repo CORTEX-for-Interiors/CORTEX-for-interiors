@@ -264,7 +264,9 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); outline
 .network-wordmark { flex-direction: column; gap: 0; color: var(--ink); }
 .wordmark-name { display: flex; align-items: center; font-family: var(--display); font-size: 38px; line-height: 1; letter-spacing: .02em; }
 .wordmark-name img { width: 35px; height: 39px; margin: 0 1px; }
-.wordmark-studio { font-size: 9px; letter-spacing: .48em; padding-left: .48em; line-height: 1.5; }
+/* Logo v3 (2026-10-23): the brain-network O, inline so it takes the theme gold. 1.08x the cap height. */
+.wordmark-mark { width: 27px; height: 27px; margin: 0 3px; color: var(--accent); overflow: visible; }
+.wordmark-studio { font-size: 9px; letter-spacing: .48em; padding-left: .48em; line-height: 1.5; color: var(--accent); }
 .site-header { background: var(--paper); }
 .site-header .wrap { max-width: none; min-height: 92px; }
 .site-nav a:not(.btn) { font-size: 13px; }
@@ -350,8 +352,7 @@ input, select, textarea { border-radius: 4px; }
   --lamp-glow: #FBE2B300;
   color-scheme: dark;
 }
-:root[data-theme="dark"] .wordmark-name img,
-:root[data-theme="dark"] .social-header img { filter: brightness(0) invert(1); }
+:root[data-theme="dark"] .wordmark-name img { filter: brightness(0) invert(1); }
 .site-header { z-index: 40; }
 .site-header .wrap { gap: 22px; }
 .site-nav { margin-left: auto; gap: 20px; }
@@ -417,7 +418,7 @@ html:has(body.journey-enabled)::-webkit-scrollbar { display: none; }
 .social-grid { display: grid; grid-template-columns: repeat(2,minmax(0,320px)); gap: 24px; margin: 26px 0 18px; }
 .social-post { background: var(--surface); border: 1px solid var(--rule); border-radius: 9px; overflow: hidden; }
 .social-header { display: flex; gap: 10px; align-items: center; padding: 12px 14px; }
-.social-header img { width: 29px; height: 29px; }
+.social-header img { width: 29px; height: 29px; border-radius: 50%; }
 .social-header strong { display: block; font-size: 12px; font-weight: 600; }
 .social-header span { display: block; font-size: 9px; color: var(--ink-mid); }
 .social-header .social-menu { margin-left: auto; font-size: 21px; color: var(--ink); }
@@ -441,6 +442,7 @@ html:has(body.journey-enabled)::-webkit-scrollbar { display: none; }
   .site-header .wrap { display: grid; grid-template-columns: 1fr auto; min-height: 106px; padding-block: 10px; gap: 8px; }
   .wordmark-name { font-size: 29px; }
   .wordmark-name img { width: 28px; height: 31px; }
+  .wordmark-mark { width: 21px; height: 21px; margin: 0 2px; }
   .wordmark-studio { font-size: 7px; }
   .network-wordmark { align-items: start; width: fit-content; }
   .wordmark-studio { align-self: center; }
