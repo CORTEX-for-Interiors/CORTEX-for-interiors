@@ -76,6 +76,21 @@ def jsonld(origin: str) -> str:
     }, ensure_ascii=False)
 
 
+def article_jsonld(origin: str, meta: dict) -> str:
+    """Article plus breadcrumb for guide pages (page header: article="yes" published="YYYY-MM-DD")."""
+    url, headline = origin + meta["path"], meta["title"].split(" · ")[0]
+    return json.dumps([
+        {"@context": "https://schema.org", "@type": "Article", "headline": headline,
+         "description": meta["description"], "datePublished": meta["published"], "url": url,
+         "author": {"@type": "Organization", "name": "Cortex Studio", "url": origin + "/"},
+         "publisher": {"@type": "Organization", "name": "Cortex Studio",
+                       "logo": {"@type": "ImageObject", "url": origin + "/android-chrome-512x512.png"}}},
+        {"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [
+            {"@type": "ListItem", "position": 1, "name": "Home", "item": origin + "/"},
+            {"@type": "ListItem", "position": 2, "name": headline, "item": url}]},
+    ], ensure_ascii=False)
+
+
 def lastmod(page: Path) -> str:
     """Last commit date of a page's source. Omitted on a shallow clone, where every page would share one date."""
     try:
@@ -120,6 +135,8 @@ def render(page: Path, origin: str) -> tuple[str, dict]:
             .replace("{{robots}}", meta.get("robots", "index,follow"))
             .replace("{{jsonld}}", jsonld(origin))
             .replace("{{og_image}}", og_tags(origin)))
+    if meta.get("article") == "yes":
+        head = head.replace("</head>", f'<script type="application/ld+json">{article_jsonld(origin, meta)}</script>\n</head>')
     header = re.sub(r"\{\{current:(/[\w-]*)\}\}",
                     lambda m: ' aria-current="page"' if m.group(1) == path else "", partial("header"))
     return head + header + body + partial("footer"), meta
@@ -238,10 +255,12 @@ def main(argv: list[str]) -> int:
     shutil.copy(SRC / "js" / "site.js", DIST / "site.js")
 
     sitemap, pages_for_llms = [], []
-    for page in sorted((SRC / "pages").glob("*.html")):
+    for page in sorted((SRC / "pages").rglob("*.html")):  # guides live in pages/guides/, served at /guides/...
         doc, meta = render(page, origin)
         gate_page(page.name, doc, meta, errors, warnings, blockers)
-        (DIST / page.name).write_text(doc, encoding="utf-8")
+        out = DIST / page.relative_to(SRC / "pages")
+        out.parent.mkdir(parents=True, exist_ok=True)
+        out.write_text(doc, encoding="utf-8")
         if meta.get("sitemap") == "yes":
             url = origin + ("/" if meta["path"] == "/" else meta["path"])
             sitemap.append((url, lastmod(page)))
