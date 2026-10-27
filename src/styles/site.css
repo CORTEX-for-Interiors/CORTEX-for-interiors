@@ -46,6 +46,16 @@ p { margin: 0 0 1em; max-width: 62ch; }
 .lede { font-size: clamp(1.1rem, 1.6vw, 1.25rem); line-height: 1.55; max-width: 42ch; color: var(--ink-mid); }
 .eyebrow { display: block; font-family: var(--body); font-size: 0.76rem; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase; color: var(--accent); margin: 0 0 22px; }
 .muted { color: var(--ink-mid); }
+/* Guides: visible trail above the H1 and the hub list (Rishi 2026-10-27). */
+.breadcrumb { display: flex; flex-wrap: wrap; gap: 6px 10px; margin: 0 0 22px; font-family: var(--body); font-size: 0.76rem; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-mid); }
+.breadcrumb a { color: var(--accent); text-decoration: none; }
+.breadcrumb a:hover { text-decoration: underline; }
+.guide-list article { padding-block: 26px; border-bottom: 1px solid var(--rule); }
+.guide-list article:first-child { padding-top: 0; }
+.guide-list h2 { margin: 0 0 8px; font-size: clamp(1.5rem, 2.4vw, 1.9rem); }
+.guide-list h2 a { color: var(--ink); text-decoration: none; }
+.guide-list h2 a:hover { color: var(--accent); }
+.guide-list p { margin: 0; color: var(--ink-mid); }
 .sample-note { font-size: 0.82rem; color: var(--ink-mid); margin: 14px 0 0; }
 
 /* Header: one line at desktop, 72px */

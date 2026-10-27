@@ -87,7 +87,8 @@ def article_jsonld(origin: str, meta: dict) -> str:
                        "logo": {"@type": "ImageObject", "url": origin + "/android-chrome-512x512.png"}}},
         {"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [
             {"@type": "ListItem", "position": 1, "name": "Home", "item": origin + "/"},
-            {"@type": "ListItem", "position": 2, "name": headline, "item": url}]},
+            {"@type": "ListItem", "position": 2, "name": "Guides", "item": origin + "/guides"},
+            {"@type": "ListItem", "position": 3, "name": headline, "item": url}]},
     ], ensure_ascii=False)
 
 
@@ -138,7 +139,8 @@ def render(page: Path, origin: str) -> tuple[str, dict]:
     if meta.get("article") == "yes":
         head = head.replace("</head>", f'<script type="application/ld+json">{article_jsonld(origin, meta)}</script>\n</head>')
     header = re.sub(r"\{\{current:(/[\w-]*)\}\}",
-                    lambda m: ' aria-current="page"' if m.group(1) == path else "", partial("header"))
+                    lambda m: ' aria-current="page"' if path == m.group(1) or path.startswith(m.group(1) + "/") else "",
+                    partial("header"))  # a guide marks Guides current
     return head + header + body + partial("footer"), meta
 
 
