@@ -55,9 +55,38 @@ def jsonld(origin: str) -> str:
         "description": CONFIG["description"],
         "areaServed": CONFIG["area_served"],
         "email": CONFIG["email"],
-        "knowsAbout": ["Interior design marketing", "Instagram content", "Content operations"],
+        "knowsAbout": ["Interior design marketing", "Social media management", "Instagram content", "Instagram Reels",
+                       "Content operations"],
         "sameAs": CONFIG.get("same_as", []),
+        # The /services menu as a catalog, names only: prices stay off the public site (Rishi 2026-10-20).
+        "hasOfferCatalog": {
+            "@type": "OfferCatalog",
+            "name": "Social media management for interior design firms",
+            "itemListElement": [
+                {"@type": "Offer", "itemOffered": {"@type": "Service", "name": name, "description": text}}
+                for name, text in [
+                    ("Essential", "12 posts a month and a weekly Story kit, from your real site photos."),
+                    ("Studio", "16 posts and 6 Reels a month, plus a weekly Story kit and a monthly strategy call."),
+                    ("Signature", "20 posts and 10 Reels a month, plus decks your team sends to single prospects."),
+                    ("Google profile care", "Photos, posts and reply drafts for your Google Business Profile."),
+                    ("Website", "A portfolio website built from your firm's brain. Quoted separately."),
+                ]
+            ],
+        },
     }, ensure_ascii=False)
+
+
+def lastmod(page: Path) -> str:
+    """Last commit date of a page's source. Omitted on a shallow clone, where every page would share one date."""
+    try:
+        shallow = subprocess.run(["git", "rev-parse", "--is-shallow-repository"], cwd=SITE,
+                                 capture_output=True, text=True, timeout=10).stdout.strip()
+        if shallow != "false":
+            return ""
+        return subprocess.run(["git", "log", "-1", "--format=%cs", "--", str(page)], cwd=SITE,
+                              capture_output=True, text=True, timeout=10).stdout.strip()
+    except (OSError, subprocess.SubprocessError):
+        return ""
 
 
 def minify_css(css: str) -> str:
@@ -215,13 +244,14 @@ def main(argv: list[str]) -> int:
         (DIST / page.name).write_text(doc, encoding="utf-8")
         if meta.get("sitemap") == "yes":
             url = origin + ("/" if meta["path"] == "/" else meta["path"])
-            sitemap.append(url)
+            sitemap.append((url, lastmod(page)))
             if "legal_draft" not in meta:
                 pages_for_llms.append((url, meta["title"].split(" · ")[0], meta["description"]))
 
     (DIST / "sitemap.xml").write_text(
         '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
-        + "".join(f"  <url><loc>{u}</loc></url>\n" for u in sitemap) + "</urlset>\n", encoding="utf-8")
+        + "".join(f"  <url><loc>{u}</loc>" + (f"<lastmod>{d}</lastmod>" if d else "") + "</url>\n" for u, d in sitemap)
+        + "</urlset>\n", encoding="utf-8")
     # Answer engines are named explicitly (PRD doc 03 §6). Same effect as the general rule.
     ai_bots = ["GPTBot", "OAI-SearchBot", "ChatGPT-User", "ClaudeBot", "Claude-User", "PerplexityBot", "Google-Extended"]
     robots = "".join(f"User-agent: {b}\nAllow: /\n\n" for b in ai_bots)
